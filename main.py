@@ -1,5 +1,6 @@
 import sys
 from PyQt5.QtCore import *
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
 
@@ -8,6 +9,8 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.browser = QWebEngineView()
         self.browser.setUrl(QUrl("http://www.google.com"))
+
+        self.setWindowIcon(QIcon("./img/icon.svg"))
 
         layout = QVBoxLayout()
         layout.addWidget(self.browser)
