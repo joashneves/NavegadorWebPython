@@ -5,6 +5,8 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
 
 class MainWindow(QMainWindow):
+    app = QCoreApplication.instance()
+    print("PyQt5 version:", QCoreApplication.applicationVersion())
     def __init__(self):
         super().__init__()
         self.browser = QWebEngineView()
@@ -55,6 +57,12 @@ class MainWindow(QMainWindow):
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         navbar.addWidget(self.urlbar)
+        # Estilo da Barra de pesquisa
+        self.urlbar.setStyleSheet("""
+          padding: 4px; 
+          border: 2px solid black;
+          border-radius: 12px;
+          """)
 
         stop_btn = QAction("Stop", self)
         stop_btn.setStatusTip("Stop loading current page")
@@ -81,8 +89,12 @@ class MainWindow(QMainWindow):
     def navigate_to_url(self):
         q = QUrl(self.urlbar.text())
         if q.scheme() == "":
-            q.setScheme("https:")
-        self.browser.setUrl(q)
+            search_query = q.toString().replace(" ", "+")
+            url = f"https://www.google.com/search?q={search_query}"
+            self.browser.setUrl(QUrl(url))
+        else:
+            self.browser.setUrl(q)
+
 
     def update_urlbar(self, q):
         self.urlbar.setText(q.toString())
