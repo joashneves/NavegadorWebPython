@@ -12,6 +12,9 @@ class MainWindow(QMainWindow):
 
         self.setWindowIcon(QIcon("./img/icon.svg"))
 
+        self.browser.urlChanged.connect(self.update_urlbar) # muda a url da barra
+        self.browser.loadFinished.connect(self.update_title) # muda o nome do navegador
+
         layout = QVBoxLayout()
         layout.addWidget(self.browser)
 
@@ -49,12 +52,17 @@ class MainWindow(QMainWindow):
         navbar.addAction(avancar_botao)
 
         # Barra de pesquisa
-        self.url_bar = QLineEdit()
-        self.url_bar.returnPressed.connect(self.go_url)
-        navbar.addWidget(self.url_bar)
-        #self.browser.urlChanged.connect(self.update_url)
+        self.urlbar = QLineEdit()
+        self.urlbar.returnPressed.connect(self.navigate_to_url)
+        navbar.addWidget(self.urlbar)
 
-        # Load home page on startup
+        stop_btn = QAction("Stop", self)
+        stop_btn.setStatusTip("Stop loading current page")
+
+        stop_btn.triggered.connect(self.browser.stop)
+        navbar.addAction(stop_btn)
+
+    # Load home page on startup
         self.load_home()
 
         # Status bar
@@ -69,15 +77,23 @@ class MainWindow(QMainWindow):
             self.status_bar.showMessage("")
         else:
             self.status_bar.showMessage("Loading... {}%".format(progress))
-    def go_url(self):
-        url = self.url_bar.text()
-        self.browser.setUrl(QUrl(url))
-    def update_url(self, url):
-        self.url_bar.setText(url.ToString)
+
+    def navigate_to_url(self):
+        q = QUrl(self.urlbar.text())
+        if q.scheme() == "":
+            q.setScheme("https:")
+        self.browser.setUrl(q)
+
+    def update_urlbar(self, q):
+        self.urlbar.setText(q.toString())
+        self.urlbar.setCursorPosition(0)
+
     def load_home(self):
         self.browser.setUrl(QUrl("http://www.google.com"))
 
-
+    def update_title(self):
+        title = self.browser.page().title()
+        self.setWindowTitle(f"Gallifrey - {title}")
 
 
 app = QApplication(sys.argv)
