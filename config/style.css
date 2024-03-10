@@ -6,10 +6,13 @@ QMainWindow { /* Barra de ferramentas */
     background-color: #41166b;
 }
 QLineEdit { /* Barra de pesquisa */
-    background-color: white;
+    background-color: rgba(255, 255, 255, 150);
     padding: 4px;
     border: 2px black;
     border-radius: 12px;
+}
+QLineEdit:hover { /* Barra de pesquisa */
+    background-color: rgba(255, 255, 255, 250);
 }
 QToolBar { /* Barra de ferramentas */
     background-color: #50237d;
@@ -18,15 +21,22 @@ QToolBar { /* Barra de ferramentas */
 }
 QToolButton {
     background-color: #20124d;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 16px;
+    border: 2px solid black;
+    padding: 4px 4px;
+    border-radius: 12px;
+    margin 2px;
     color: white;
+    transition: background-color 0.3s ease, border-radius 0.3s ease;
 }
 QToolButton:hover {
     background-color:  #8e7cc3;
+    border: 2px solid white;
+    border-radius: 10px;
     cursor: pointer;
 }
 QToolButton:pressed {
+    background-color: #d9d2e9;
+}
+QComboBox{
     background-color: #d9d2e9;
 }

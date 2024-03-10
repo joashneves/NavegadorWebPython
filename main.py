@@ -18,21 +18,16 @@ class MainWindow(QMainWindow):
         settings = self.browser.settings()
         settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)
         settings.setAttribute(QWebEngineSettings.AutoLoadImages, True)
-        #settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
+        settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
         settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
         settings.setAttribute(QWebEngineSettings.JavascriptCanAccessClipboard, True)
         settings.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows, True)
-        #settings.setAttribute(QWebEngineSettings.JavascriptCanCloseWindows, True)
+        settings.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows, True)
         settings.setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, True)
         settings.setAttribute(QWebEngineSettings.WebGLEnabled, True)
 
-        # Definindo a linguagem padrão do navegador para português
-        #settings.setAttribute(QWebEngineSettings.WebAttribute.AcceptLanguage, "pt-BR")
-
-
         self.browser.urlChanged.connect(self.update_urlbar) # muda a url da barra
         self.browser.loadFinished.connect(self.update_title) # muda o nome do navegador
-
 
         layout = QVBoxLayout()
         layout.addWidget(self.browser)
@@ -100,6 +95,14 @@ class MainWindow(QMainWindow):
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         navbar.addWidget(self.urlbar)
 
+        #Adicionando Menu
+        menuBox = QComboBox()
+        menuBox.addItems(['Opções', 'Histórico'])
+        menuBox.currentIndexChanged.connect(self.opcao_selecionada)
+
+        # Add the dropdown button to the navigation bar
+        navbar.addWidget(menuBox)
+
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
             self.setStyleSheet(f.read())
@@ -114,6 +117,10 @@ class MainWindow(QMainWindow):
         # Loading progress
         if(self.browser.loadProgress):
             self.browser.loadProgress.connect(self.update_loading_progress)
+
+    def opcao_selecionada(self, index):
+        opcao_selecionada = self.combobox.itemText(index)
+        print(f"Opção selecionada: {opcao_selecionada}")
 
     def update_loading_progress(self, progress):
         if progress == 100:

@@ -15,6 +15,12 @@ Os objetivos que eu tenho para termina o projeto são os seguintes:
  - Favoritos
  - Abas
  - Pesquisa
- - Bloqueio de pop-ups e anúncios
 
 Não que eu tenha terminado todos, porem são os que eu quero fazer e terminar
+
+#### Requisitos não funcionais
+
+ - Bloqueio de pop-ups e anúncios
+ - Terminal para javascrip e inspenciona web
+ - Dicionario
+ - Configurações do navegador em html
