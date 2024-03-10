@@ -34,43 +34,47 @@ class MainWindow(QMainWindow):
         self.addToolBar(navbar)
 
         # Botão Voltar
-        voltar_botao = QAction('<', self)
-        voltar_botao.triggered.connect(self.browser.back)
-        navbar.addAction(voltar_botao)
+        voltar_botao = QToolButton()
+        voltar_botao.setText('<')
+        voltar_botao.clicked.connect(self.browser.back)
+        voltar_botao.setCursor(Qt.PointingHandCursor)
+        voltar_botao.setObjectName("voltar_botao")  # Definindo um ID único para o botão
+        navbar.addWidget(voltar_botao)
 
         # Botão Recarregar
-        recarregar_botao = QAction('R', self)
-        recarregar_botao.triggered.connect(self.browser.reload)
-        navbar.addAction(recarregar_botao)
+        recarregar_botao = QToolButton()
+        recarregar_botao.setText('R')
+        recarregar_botao.clicked.connect(self.browser.reload)
+        recarregar_botao.setCursor(Qt.PointingHandCursor)
+        recarregar_botao.setObjectName("recarregar_botao")  # Definindo um ID único para o botão
+        navbar.addWidget(recarregar_botao)
 
         # Botão Home
-        home_botao = QAction('H', self)
-        home_botao.triggered.connect(self.load_home)
-        navbar.addAction(home_botao)
+        home_botao = QToolButton()
+        home_botao.setText('H')
+        home_botao.clicked.connect(self.load_home)
+        home_botao.setCursor(Qt.PointingHandCursor)
+        home_botao.setObjectName("home_botao")  # Definindo um ID único para o botão
+        navbar.addWidget(home_botao)
 
         # Botão Avançar
-        avancar_botao = QAction('>', self)
-        avancar_botao.triggered.connect(self.browser.forward)
-        navbar.addAction(avancar_botao)
+        avancar_botao = QToolButton()
+        avancar_botao.setText('>')
+        avancar_botao.clicked.connect(self.browser.forward)
+        avancar_botao.setCursor(Qt.PointingHandCursor)
+        avancar_botao.setObjectName("avancar_botao")  # Definindo um ID único para o botão
+        navbar.addWidget(avancar_botao)
 
         # Barra de pesquisa
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         navbar.addWidget(self.urlbar)
-        # Estilo da Barra de pesquisa
-        self.urlbar.setStyleSheet("""
-          padding: 4px; 
-          border: 2px solid black;
-          border-radius: 12px;
-          """)
 
-        stop_btn = QAction("Stop", self)
-        stop_btn.setStatusTip("Stop loading current page")
+        # Carrega o arquivo CSS e aplica o estilo
+        with open("config/style.css", "r") as f:
+            self.setStyleSheet(f.read())
 
-        stop_btn.triggered.connect(self.browser.stop)
-        navbar.addAction(stop_btn)
-
-    # Load home page on startup
+        # Load home page on startup
         self.load_home()
 
         # Status bar
@@ -78,7 +82,8 @@ class MainWindow(QMainWindow):
         self.setStatusBar(self.status_bar)
 
         # Loading progress
-        self.browser.loadProgress.connect(self.update_loading_progress)
+        if(self.browser.loadProgress):
+            self.browser.loadProgress.connect(self.update_loading_progress)
 
     def update_loading_progress(self, progress):
         if progress == 100:

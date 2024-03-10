@@ -1,0 +1,33 @@
+/* style.css */
+QWebEngineView{
+    background-color: black;
+}
+QMainWindow {
+    background-color: #41166b;
+}
+QLineEdit {
+    background-color: white;
+    padding: 4px;
+    border: 2px solid black;
+    border-radius: 12px;
+}
+QToolBar {
+    background-color: #50237d;
+    border: none;
+    cursor: pointer;
+}
+QToolButton {
+    background-color: #8A2BE2;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    color: white;
+}
+QToolButton:hover {
+    background-color: #0056b3;
+    cursor: pointer;
+}
+QToolButton:pressed {
+    background-color: #003d7e;
+
+}
