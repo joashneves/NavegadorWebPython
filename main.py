@@ -14,8 +14,25 @@ class MainWindow(QMainWindow):
 
         self.setWindowIcon(QIcon("./img/icon.svg"))
 
+        # Definindo as preferências do navegador
+        settings = self.browser.settings()
+        settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)
+        settings.setAttribute(QWebEngineSettings.AutoLoadImages, True)
+        #settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
+        settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
+        settings.setAttribute(QWebEngineSettings.JavascriptCanAccessClipboard, True)
+        settings.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows, True)
+        #settings.setAttribute(QWebEngineSettings.JavascriptCanCloseWindows, True)
+        settings.setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, True)
+        settings.setAttribute(QWebEngineSettings.WebGLEnabled, True)
+
+        # Definindo a linguagem padrão do navegador para português
+        #settings.setAttribute(QWebEngineSettings.WebAttribute.AcceptLanguage, "pt-BR")
+
+
         self.browser.urlChanged.connect(self.update_urlbar) # muda a url da barra
         self.browser.loadFinished.connect(self.update_title) # muda o nome do navegador
+
 
         layout = QVBoxLayout()
         layout.addWidget(self.browser)
@@ -23,15 +40,28 @@ class MainWindow(QMainWindow):
         container = QWidget()
         container.setLayout(layout)
 
-        self.setCentralWidget(container)
+        self.setCentralWidget(self.browser)
+        # Evento para mostrar o QWebEngineView quando o mouse estiver próximo
+        self.centralWidget().setMouseTracking(True)
+        self.centralWidget().installEventFilter(self)
 
         #Titulo
         self.setWindowTitle("Gallifrey")
-        self.setGeometry(100, 100, 800, 600)
-
+        self.setGeometry(0,0,800,600)
+        self.setAttribute(Qt.WA_TranslucentBackground)
         #Barra de Navegação
         navbar = QToolBar()
-        self.addToolBar(navbar)
+        navbar.setMouseTracking(True)
+        navbar.setVisible(True)
+        navbar.installEventFilter(self)
+        # Conectar os eventos enterEvent e leaveEvent aos métodos correspondentes
+
+        self.addToolBar(navbar) # Add nav bar
+
+
+        # Evento para mostrar o QWebEngineView quando o mouse estiver próximo da barra de ferramentas
+        navbar.setMouseTracking(True)
+        navbar.installEventFilter(self)
 
         # Botão Voltar
         voltar_botao = QToolButton()
