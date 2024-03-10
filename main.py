@@ -97,7 +97,9 @@ class MainWindow(QMainWindow):
 
         #Adicionando Menu
         menuBox = QComboBox()
-        menuBox.addItems(['Opções', 'Histórico'])
+        menuBox.addItems(['','Opções', 'Histórico'])
+        # Definir ícone apenas para o primeiro item
+        menuBox.setItemIcon(0, QIcon('img/settings.svg'))  # Ícone para 'Opções'
         menuBox.currentIndexChanged.connect(self.opcao_selecionada)
 
         # Add the dropdown button to the navigation bar
