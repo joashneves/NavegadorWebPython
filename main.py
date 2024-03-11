@@ -9,6 +9,7 @@ from PyQt5.QtWebEngineWidgets import *
 class MainWindow(QMainWindow):
     app = QCoreApplication.instance()
     print(f"PyQt5 version: {PyQt5.uic.pyuic.Version}")
+    historico = []
     def __init__(self):
         super().__init__()
         self.browser = QWebEngineView()
@@ -175,6 +176,8 @@ class MainWindow(QMainWindow):
             self.browser.setUrl(QUrl(url))
         else:
             self.browser.setUrl(q)
+        self.historico.append(q)
+        print(self.historico)
 
 
     def update_urlbar(self, q):
