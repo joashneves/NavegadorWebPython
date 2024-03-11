@@ -79,6 +79,8 @@ class MainWindow(QMainWindow):
         self.navbar.installEventFilter(self)
 
         self.addToolBar( self.navbar) # Add nav bar
+        # Mover a barra de navegação para a posição desejada
+        self.navbar.move(0, self.height() - self.navbar.height())
 
         # Evento para mostrar o QWebEngineView quando o mouse estiver próximo da barra de ferramentas
         self.navbar.setMouseTracking(True)
@@ -160,6 +162,7 @@ class MainWindow(QMainWindow):
             self.showMaximized()
 
     def mostrar_barra_lateral(self):
+        print(self.navbar.geometry())
         if self.configuracaoBarra.isVisible():
             self.configuracaoBarra.setVisible(False)
         else:
