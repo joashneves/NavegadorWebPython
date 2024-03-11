@@ -121,6 +121,7 @@ class MainWindow(QMainWindow):
         self.configuracaoBarra = QToolBar()
         self.configuracaoBarra.setIconSize(QSize(16, 16))
         self.addToolBar(Qt.RightToolBarArea, self.configuracaoBarra)
+        self.configuracaoBarra.setVisible(False)
 
         button_action = QAction(QIcon("/img/settings.svg"), "Config's", self)
         button_action.setStatusTip("This is your button")
