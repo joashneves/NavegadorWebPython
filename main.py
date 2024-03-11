@@ -200,7 +200,7 @@ class MainWindow(QMainWindow):
         h = self.historico
         data = datetime.now()
         pagina = [title, q.toString(), data.strftime("%d/%m/%Y")]
-        if len(h) == 0 or h[-1] != q.toString():
+        if len(h) == 0 or h[-1] != pagina:
             h.append(pagina)
         print(h)
 app = QApplication(sys.argv)
