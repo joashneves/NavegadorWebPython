@@ -4,16 +4,6 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
 
-class BrowserTab(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self.layout = QVBoxLayout(self)
-        self.browser = QWebEngineView()
-        self.layout.addWidget(self.browser)
-
-        self.browser.setUrl("http://www.google.com")
-
 class MainWindow(QMainWindow):
     app = QCoreApplication.instance()
     print("PyQt5 version:", QCoreApplication.applicationVersion())
@@ -22,8 +12,28 @@ class MainWindow(QMainWindow):
         self.browser = QWebEngineView()
         self.browser.setUrl(QUrl("http://www.google.com"))
 
+        #Titulo
+        self.setGeometry(0,0,800,600)
         self.setWindowIcon(QIcon("./img/icon.svg"))
 
+        self.BrowserTab()
+
+        # Carrega o arquivo CSS e aplica o estilo
+        with open("config/style.css", "r") as f:
+            self.setStyleSheet(f.read())
+
+        # Load home page on startup
+        self.load_home()
+
+        # Status bar
+        self.status_bar = QStatusBar()
+        self.setStatusBar(self.status_bar)
+
+        # Loading progress
+        if(self.browser.loadProgress):
+            self.browser.loadProgress.connect(self.update_loading_progress)
+
+    def BrowserTab(self):
         # Definindo as preferências do navegador
         settings = self.browser.settings()
         settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)
@@ -51,22 +61,18 @@ class MainWindow(QMainWindow):
         self.centralWidget().setMouseTracking(True)
         self.centralWidget().installEventFilter(self)
 
-        #Titulo
-        self.setWindowTitle("Gallifrey")
-        self.setGeometry(0,0,800,600)
+        # Criar Barra de Navegação
+        self.navbar = QToolBar("Ferramentas")
 
-        #Barra de Navegação
-        navbar = QToolBar()
-        navbar.setMouseTracking(True)
-        navbar.setVisible(True)
-        navbar.installEventFilter(self)
-        # Conectar os eventos enterEvent e leaveEvent aos métodos correspondentes
+        self.navbar.setFixedHeight(41)
+        self.navbar.isLeftToRight()
+        self.navbar.installEventFilter(self)
 
-        self.addToolBar(navbar) # Add nav bar
+        self.addToolBar( self.navbar) # Add nav bar
 
         # Evento para mostrar o QWebEngineView quando o mouse estiver próximo da barra de ferramentas
-        navbar.setMouseTracking(True)
-        navbar.installEventFilter(self)
+        self.navbar.setMouseTracking(True)
+        self.navbar.installEventFilter(self)
 
         # Botão Voltar
         voltar_botao = QToolButton()
@@ -74,7 +80,7 @@ class MainWindow(QMainWindow):
         voltar_botao.clicked.connect(self.browser.back)
         voltar_botao.setCursor(Qt.PointingHandCursor)
         voltar_botao.setObjectName("voltar_botao")  # Definindo um ID único para o botão
-        navbar.addWidget(voltar_botao)
+        self.navbar.addWidget(voltar_botao)
 
         # Botão Recarregar
         recarregar_botao = QToolButton()
@@ -82,7 +88,7 @@ class MainWindow(QMainWindow):
         recarregar_botao.clicked.connect(self.browser.reload)
         recarregar_botao.setCursor(Qt.PointingHandCursor)
         recarregar_botao.setObjectName("recarregar_botao")  # Definindo um ID único para o botão
-        navbar.addWidget(recarregar_botao)
+        self.navbar.addWidget(recarregar_botao)
 
         # Botão Home
         home_botao = QToolButton()
@@ -90,7 +96,7 @@ class MainWindow(QMainWindow):
         home_botao.clicked.connect(self.load_home)
         home_botao.setCursor(Qt.PointingHandCursor)
         home_botao.setObjectName("home_botao")  # Definindo um ID único para o botão
-        navbar.addWidget(home_botao)
+        self.navbar.addWidget(home_botao)
 
         # Botão Avançar
         avancar_botao = QToolButton()
@@ -99,12 +105,12 @@ class MainWindow(QMainWindow):
         avancar_botao.setCursor(Qt.PointingHandCursor)
         avancar_botao.setObjectName("avancar_botao")
         avancar_botao.setVisible(True)
-        navbar.addWidget(avancar_botao)
+        self.navbar.addWidget(avancar_botao)
 
         # Barra de pesquisa
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
-        navbar.addWidget(self.urlbar)
+        self.navbar.addWidget(self.urlbar)
 
         # Adiciona um espaço vazio para posicionar a barra lateral no final da página
         layout.addStretch()
@@ -116,7 +122,7 @@ class MainWindow(QMainWindow):
         abrir_barra_lateral.setCursor(Qt.PointingHandCursor)
         abrir_barra_lateral.setObjectName("abrir_barra_lateral")
         abrir_barra_lateral.setVisible(True)
-        navbar.addWidget(abrir_barra_lateral)
+        self.navbar.addWidget(abrir_barra_lateral)
 
         self.configuracaoBarra = QToolBar()
         self.configuracaoBarra.setIconSize(QSize(16, 16))
@@ -137,27 +143,12 @@ class MainWindow(QMainWindow):
         # Adiciona o navegador à janela central
         self.setCentralWidget(self.browser)
 
-        # Carrega o arquivo CSS e aplica o estilo
-        with open("config/style.css", "r") as f:
-            self.setStyleSheet(f.read())
+    def toggleMaximize(self):
+        if self.isMaximized():
+            self.showNormal()
+        else:
+            self.showMaximized()
 
-        # Load home page on startup
-        self.load_home()
-
-        # Status bar
-        self.status_bar = QStatusBar()
-        self.setStatusBar(self.status_bar)
-
-        # Loading progress
-        if(self.browser.loadProgress):
-            self.browser.loadProgress.connect(self.update_loading_progress)
-
-
-    def add_new_tab(self):
-        new_tab = BrowserTab()
-        index = self.tab_widget.count() - 1
-        self.tab_widget.insertTab(index, new_tab, "Nova aba")
-        self.tab_widget.setCurrentIndex(index)
     def mostrar_barra_lateral(self):
         if self.configuracaoBarra.isVisible():
             self.configuracaoBarra.setVisible(False)
