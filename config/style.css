@@ -2,6 +2,9 @@
 QWebEngineView{
     background-color: black;
 }
+.configuracao_barra_lateral{
+    background-color: white;
+}
 QMainWindow { /* Barra de ferramentas */
     background-color: #41166b;
 }
@@ -37,8 +40,7 @@ QToolButton:hover {
 QToolButton:pressed {
     background-color: #d9d2e9;
 }
-QComboBox
-{
+QComboBox{
     subcontrol-origin: padding;
     subcontrol-position: top right;
     selection-background-color: #111;

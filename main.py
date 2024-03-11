@@ -4,6 +4,16 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
 
+class BrowserTab(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        self.layout = QVBoxLayout(self)
+        self.browser = QWebEngineView()
+        self.layout.addWidget(self.browser)
+
+        self.browser.setUrl("http://www.google.com")
+
 class MainWindow(QMainWindow):
     app = QCoreApplication.instance()
     print("PyQt5 version:", QCoreApplication.applicationVersion())
@@ -43,7 +53,7 @@ class MainWindow(QMainWindow):
         #Titulo
         self.setWindowTitle("Gallifrey")
         self.setGeometry(0,0,800,600)
-        self.setAttribute(Qt.WA_TranslucentBackground)
+
         #Barra de Navegação
         navbar = QToolBar()
         navbar.setMouseTracking(True)
@@ -52,7 +62,6 @@ class MainWindow(QMainWindow):
         # Conectar os eventos enterEvent e leaveEvent aos métodos correspondentes
 
         self.addToolBar(navbar) # Add nav bar
-
 
         # Evento para mostrar o QWebEngineView quando o mouse estiver próximo da barra de ferramentas
         navbar.setMouseTracking(True)
@@ -87,7 +96,8 @@ class MainWindow(QMainWindow):
         avancar_botao.setText('>')
         avancar_botao.clicked.connect(self.browser.forward)
         avancar_botao.setCursor(Qt.PointingHandCursor)
-        avancar_botao.setObjectName("avancar_botao")  # Definindo um ID único para o botão
+        avancar_botao.setObjectName("avancar_botao")
+        avancar_botao.setVisible(True)
         navbar.addWidget(avancar_botao)
 
         # Barra de pesquisa
@@ -95,15 +105,23 @@ class MainWindow(QMainWindow):
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         navbar.addWidget(self.urlbar)
 
-        #Adicionando Menu
-        menuBox = QComboBox()
-        menuBox.addItems(['...','Opções', 'Histórico'])
-        # Definir ícone apenas para o primeiro item
-        menuBox.setItemIcon(0, QIcon('img/settings.svg'))  # Ícone para 'Opções'
-        menuBox.currentIndexChanged.connect(self.opcao_selecionada)
+        # Botão para configuração
+        configuracaoBoton = QToolButton()
+        configuracaoBoton.setIcon(QIcon('img/settings.svg'))
+        configuracaoBoton.clicked.connect(self.mostrar_barra_lateral)
+        navbar.addWidget(configuracaoBoton)
 
-        # Add the dropdown button to the navigation bar
-        navbar.addWidget(menuBox)
+        # Configuração da barra lateral
+        self.configuracao_barra_lateral = QDockWidget("Configurações", self)
+        self.configuracao_barra_lateral.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        self.configuracao_barra_lateral.setFeatures(QDockWidget.NoDockWidgetFeatures)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.configuracao_barra_lateral)
+        self.configuracao_barra_lateral.hide()
+        self.configuracao_barra_lateral.setMinimumWidth(300)  # Definindo a largura mínima
+        self.configuracao_barra_lateral.setMaximumWidth(800)  # Definindo a largura máxima
+
+        # Adiciona o navegador à janela central
+        self.setCentralWidget(self.browser)
 
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
@@ -120,10 +138,16 @@ class MainWindow(QMainWindow):
         if(self.browser.loadProgress):
             self.browser.loadProgress.connect(self.update_loading_progress)
 
-    def opcao_selecionada(self, index):
-        opcao_selecionada = self.combobox.itemText(index)
-        print(f"Opção selecionada: {opcao_selecionada}")
-
+    def add_new_tab(self):
+        new_tab = BrowserTab()
+        index = self.tab_widget.count() - 1
+        self.tab_widget.insertTab(index, new_tab, "Nova aba")
+        self.tab_widget.setCurrentIndex(index)
+    def mostrar_barra_lateral(self):
+        if self.configuracao_barra_lateral.isHidden():
+            self.configuracao_barra_lateral.show()
+        else:
+            self.configuracao_barra_lateral.hide()
     def update_loading_progress(self, progress):
         if progress == 100:
             self.status_bar.showMessage("")
@@ -150,7 +174,6 @@ class MainWindow(QMainWindow):
     def update_title(self):
         title = self.browser.page().title()
         self.setWindowTitle(f"Gallifrey - {title}")
-
 
 app = QApplication(sys.argv)
 window = MainWindow()
