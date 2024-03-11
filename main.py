@@ -9,6 +9,7 @@ from PyQt5.QtWebEngineWidgets import *
 class MainWindow(QMainWindow):
     app = QCoreApplication.instance()
     print(f"PyQt5 version: {PyQt5.uic.pyuic.Version}")
+    historico_de_pesquisa = []
     historico = []
     def __init__(self):
         super().__init__()
@@ -176,11 +177,11 @@ class MainWindow(QMainWindow):
             self.browser.setUrl(QUrl(url))
         else:
             self.browser.setUrl(q)
-        # Adiciona ao historico
-        h = self.historico
+        # Adiciona ao historico de pesquisa
+        h = self.historico_de_pesquisa
         if len(h) == 0 or h[-1] != q.toString:
-            self.historico.append(q.toString())
-            print(self.historico)
+            h.append(q.toString())
+
 
 
     def update_urlbar(self, q):
@@ -194,6 +195,11 @@ class MainWindow(QMainWindow):
         title = self.browser.page().title()
         self.setWindowTitle(f"Gallifrey - {title}")
 
+        # Adiciona ao historico de pesquisa
+        q = QUrl(self.urlbar.text())
+        h = self.historico
+        if len(h) == 0 or h[-1] != q.toString():
+            h.append(q.toString())
 app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
