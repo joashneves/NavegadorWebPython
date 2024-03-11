@@ -176,8 +176,11 @@ class MainWindow(QMainWindow):
             self.browser.setUrl(QUrl(url))
         else:
             self.browser.setUrl(q)
-        self.historico.append(q)
-        print(self.historico)
+        # Adiciona ao historico
+        h = self.historico
+        if len(h) == 0 or h[-1] != q.toString:
+            self.historico.append(q.toString())
+            print(self.historico)
 
 
     def update_urlbar(self, q):
