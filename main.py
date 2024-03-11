@@ -1,3 +1,4 @@
+from datetime import datetime
 import sys
 
 import PyQt5.uic.pyuic
@@ -7,6 +8,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
 
 class MainWindow(QMainWindow):
+
     app = QCoreApplication.instance()
     print(f"PyQt5 version: {PyQt5.uic.pyuic.Version}")
     historico_de_pesquisa = []
@@ -182,8 +184,6 @@ class MainWindow(QMainWindow):
         if len(h) == 0 or h[-1] != q.toString:
             h.append(q.toString())
 
-
-
     def update_urlbar(self, q):
         self.urlbar.setText(q.toString())
         self.urlbar.setCursorPosition(0)
@@ -198,8 +198,11 @@ class MainWindow(QMainWindow):
         # Adiciona ao historico de pesquisa
         q = QUrl(self.urlbar.text())
         h = self.historico
+        data = datetime.now()
+        pagina = [title, q.toString(), data.strftime("%d/%m/%Y")]
         if len(h) == 0 or h[-1] != q.toString():
-            h.append(q.toString())
+            h.append(pagina)
+        print(h)
 app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
