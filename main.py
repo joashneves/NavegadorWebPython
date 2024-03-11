@@ -110,21 +110,28 @@ class MainWindow(QMainWindow):
         layout.addStretch()
 
         # Configuração da barra lateral
-        configuracaoBarra = QToolBar()
-        configuracaoBarra.setIconSize(QSize(16, 16))
-        self.addToolBar(Qt.RightToolBarArea, configuracaoBarra)
+        abrir_barra_lateral = QToolButton()
+        abrir_barra_lateral.setIcon(QIcon('./img/settings.svg'))
+        abrir_barra_lateral.clicked.connect(self.mostrar_barra_lateral)
+        abrir_barra_lateral.setCursor(Qt.PointingHandCursor)
+        abrir_barra_lateral.setObjectName("abrir_barra_lateral")
+        abrir_barra_lateral.setVisible(True)
+        navbar.addWidget(abrir_barra_lateral)
+
+        self.configuracaoBarra = QToolBar()
+        self.configuracaoBarra.setIconSize(QSize(16, 16))
+        self.addToolBar(Qt.RightToolBarArea, self.configuracaoBarra)
 
         button_action = QAction(QIcon("/img/settings.svg"), "Config's", self)
         button_action.setStatusTip("This is your button")
         button_action.setCheckable(True)
-        configuracaoBarra.addAction(button_action)
+        self.configuracaoBarra.addAction(button_action)
 
         button_action2 = QAction(QIcon("/img/settings.svg"), "Fav's", self)
         button_action2.setStatusTip("This is your button2")
-        button_action2.triggered.connect(self.onMyToolBarButtonClick)
-        button_action2.setCheckable(True)
-        configuracaoBarra.addAction(button_action2)
 
+        button_action2.setCheckable(True)
+        self.configuracaoBarra.addAction(button_action2)
 
         # Adiciona o navegador à janela central
         self.setCentralWidget(self.browser)
@@ -144,8 +151,6 @@ class MainWindow(QMainWindow):
         if(self.browser.loadProgress):
             self.browser.loadProgress.connect(self.update_loading_progress)
 
-    def onMyToolBarButtonClick(self, s):
-        print("click", s)
 
     def add_new_tab(self):
         new_tab = BrowserTab()
@@ -153,10 +158,12 @@ class MainWindow(QMainWindow):
         self.tab_widget.insertTab(index, new_tab, "Nova aba")
         self.tab_widget.setCurrentIndex(index)
     def mostrar_barra_lateral(self):
-        if self.configuracao_barra_lateral.isHidden():
-            self.configuracao_barra_lateral.show()
+        if self.configuracaoBarra.isVisible():
+            self.configuracaoBarra.setVisible(False)
         else:
-            self.configuracao_barra_lateral.hide()
+            self.addToolBar(Qt.RightToolBarArea, self.configuracaoBarra)
+            self.configuracaoBarra.setVisible(True)
+
     def update_loading_progress(self, progress):
         if progress == 100:
             self.status_bar.showMessage("")
