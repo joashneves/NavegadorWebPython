@@ -1,4 +1,6 @@
 import sys
+
+import PyQt5.uic.pyuic
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
@@ -6,7 +8,7 @@ from PyQt5.QtWebEngineWidgets import *
 
 class MainWindow(QMainWindow):
     app = QCoreApplication.instance()
-    print("PyQt5 version:", QCoreApplication.applicationVersion())
+    print(f"PyQt5 version: {PyQt5.uic.pyuic.Version}")
     def __init__(self):
         super().__init__()
         self.browser = QWebEngineView()
@@ -61,6 +63,10 @@ class MainWindow(QMainWindow):
         self.browser.urlChanged.connect(self.update_urlbar) # muda a url da barra
         self.browser.loadFinished.connect(self.update_title) # muda o nome do navegador
 
+        # Evento para mostrar o QWebEngineView quando o mouse estiver próximo da barra de ferramentas
+        self.guias_navegador.setMouseTracking(True)
+        self.guias_navegador.installEventFilter(self)
+
         layout = QVBoxLayout()
         layout.addWidget(self.browser)
 
@@ -72,27 +78,14 @@ class MainWindow(QMainWindow):
         self.centralWidget().setMouseTracking(True)
         self.centralWidget().installEventFilter(self)
 
-        # Criar Barra de Navegação
-        self.navbar = QToolBar("Ferramentas")
-        self.navbar.setFixedHeight(41)
-        self.navbar.isLeftToRight()
-        self.navbar.installEventFilter(self)
-
-        self.addToolBar( self.navbar) # Add nav bar
-        # Mover a barra de navegação para a posição desejada
-        self.navbar.move(0, self.height() - self.navbar.height())
-
-        # Evento para mostrar o QWebEngineView quando o mouse estiver próximo da barra de ferramentas
-        self.navbar.setMouseTracking(True)
-        self.navbar.installEventFilter(self)
-
+        self.guias_navegador.addSeparator() # Separador das guias para a ferramenta
         # Botão Voltar
         voltar_botao = QToolButton()
         voltar_botao.setText('<')
         voltar_botao.clicked.connect(self.browser.back)
         voltar_botao.setCursor(Qt.PointingHandCursor)
         voltar_botao.setObjectName("voltar_botao")  # Definindo um ID único para o botão
-        self.navbar.addWidget(voltar_botao)
+        self.guias_navegador.addWidget(voltar_botao)
 
         # Botão Recarregar
         recarregar_botao = QToolButton()
@@ -100,7 +93,7 @@ class MainWindow(QMainWindow):
         recarregar_botao.clicked.connect(self.browser.reload)
         recarregar_botao.setCursor(Qt.PointingHandCursor)
         recarregar_botao.setObjectName("recarregar_botao")  # Definindo um ID único para o botão
-        self.navbar.addWidget(recarregar_botao)
+        self.guias_navegador.addWidget(recarregar_botao)
 
         # Botão Home
         home_botao = QToolButton()
@@ -108,7 +101,7 @@ class MainWindow(QMainWindow):
         home_botao.clicked.connect(self.load_home)
         home_botao.setCursor(Qt.PointingHandCursor)
         home_botao.setObjectName("home_botao")  # Definindo um ID único para o botão
-        self.navbar.addWidget(home_botao)
+        self.guias_navegador.addWidget(home_botao)
 
         # Botão Avançar
         avancar_botao = QToolButton()
@@ -117,12 +110,12 @@ class MainWindow(QMainWindow):
         avancar_botao.setCursor(Qt.PointingHandCursor)
         avancar_botao.setObjectName("avancar_botao")
         avancar_botao.setVisible(True)
-        self.navbar.addWidget(avancar_botao)
+        self.guias_navegador.addWidget(avancar_botao)
 
         # Barra de pesquisa
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
-        self.navbar.addWidget(self.urlbar)
+        self.guias_navegador.addWidget(self.urlbar)
 
         # Adiciona um espaço vazio para posicionar a barra lateral no final da página
         layout.addStretch()
@@ -134,7 +127,7 @@ class MainWindow(QMainWindow):
         abrir_barra_lateral.setCursor(Qt.PointingHandCursor)
         abrir_barra_lateral.setObjectName("abrir_barra_lateral")
         abrir_barra_lateral.setVisible(True)
-        self.navbar.addWidget(abrir_barra_lateral)
+        self.guias_navegador.addWidget(abrir_barra_lateral)
 
         self.configuracaoBarra = QToolBar()
         self.configuracaoBarra.setIconSize(QSize(16, 16))
@@ -162,7 +155,6 @@ class MainWindow(QMainWindow):
             self.showMaximized()
 
     def mostrar_barra_lateral(self):
-        print(self.navbar.geometry())
         if self.configuracaoBarra.isVisible():
             self.configuracaoBarra.setVisible(False)
         else:
