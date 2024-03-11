@@ -42,6 +42,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         layout.addWidget(self.browser)
 
+
         container = QWidget()
         container.setLayout(layout)
 
@@ -105,20 +106,25 @@ class MainWindow(QMainWindow):
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         navbar.addWidget(self.urlbar)
 
-        # Botão para configuração
-        configuracaoBoton = QToolButton()
-        configuracaoBoton.setIcon(QIcon('img/settings.svg'))
-        configuracaoBoton.clicked.connect(self.mostrar_barra_lateral)
-        navbar.addWidget(configuracaoBoton)
+        # Adiciona um espaço vazio para posicionar a barra lateral no final da página
+        layout.addStretch()
 
         # Configuração da barra lateral
-        self.configuracao_barra_lateral = QDockWidget("Configurações", self)
-        self.configuracao_barra_lateral.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
-        self.configuracao_barra_lateral.setFeatures(QDockWidget.NoDockWidgetFeatures)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.configuracao_barra_lateral)
-        self.configuracao_barra_lateral.hide()
-        self.configuracao_barra_lateral.setMinimumWidth(300)  # Definindo a largura mínima
-        self.configuracao_barra_lateral.setMaximumWidth(800)  # Definindo a largura máxima
+        configuracaoBarra = QToolBar()
+        configuracaoBarra.setIconSize(QSize(16, 16))
+        self.addToolBar(Qt.RightToolBarArea, configuracaoBarra)
+
+        button_action = QAction(QIcon("/img/settings.svg"), "Config's", self)
+        button_action.setStatusTip("This is your button")
+        button_action.setCheckable(True)
+        configuracaoBarra.addAction(button_action)
+
+        button_action2 = QAction(QIcon("/img/settings.svg"), "Fav's", self)
+        button_action2.setStatusTip("This is your button2")
+        button_action2.triggered.connect(self.onMyToolBarButtonClick)
+        button_action2.setCheckable(True)
+        configuracaoBarra.addAction(button_action2)
+
 
         # Adiciona o navegador à janela central
         self.setCentralWidget(self.browser)
@@ -137,6 +143,9 @@ class MainWindow(QMainWindow):
         # Loading progress
         if(self.browser.loadProgress):
             self.browser.loadProgress.connect(self.update_loading_progress)
+
+    def onMyToolBarButtonClick(self, s):
+        print("click", s)
 
     def add_new_tab(self):
         new_tab = BrowserTab()
