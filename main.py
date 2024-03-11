@@ -16,7 +16,19 @@ class MainWindow(QMainWindow):
         self.setGeometry(0,0,800,600)
         self.setWindowIcon(QIcon("./img/icon.svg"))
 
-        self.BrowserTab()
+        self.guias_navegador = QToolBar()
+        self.addToolBar(self.guias_navegador)
+        self.guias_navegador.setFixedHeight(32)
+        self.guias_navegador.setMovable(False)
+        self.guias_navegador.addSeparator()
+
+
+        criar_guia_navegador = QToolButton()
+        criar_guia_navegador.setText('+')
+        criar_guia_navegador.setObjectName("criar_guia_navegador")  # Definindo um ID único para o botão
+        self.guias_navegador.addWidget(criar_guia_navegador)
+
+        self.BrowserTab() # chama browser
 
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
@@ -52,7 +64,6 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout()
         layout.addWidget(self.browser)
 
-
         container = QWidget()
         container.setLayout(layout)
 
@@ -63,7 +74,6 @@ class MainWindow(QMainWindow):
 
         # Criar Barra de Navegação
         self.navbar = QToolBar("Ferramentas")
-
         self.navbar.setFixedHeight(41)
         self.navbar.isLeftToRight()
         self.navbar.installEventFilter(self)
