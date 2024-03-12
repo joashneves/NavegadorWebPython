@@ -28,11 +28,11 @@ class MainWindow(QMainWindow):
         # Titulo
         self.setGeometry(0, 0, 800, 600)
         self.setWindowIcon(QIcon("./img/icon.svg"))
-        """
+
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
             self.setStyleSheet(f.read())
-
+        """
         # Load home page on startup
         self.load_home()
 
