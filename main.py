@@ -22,7 +22,7 @@ class MainWindow(QMainWindow):
         self.setGeometry(0,0,800,600)
         self.setWindowIcon(QIcon("./img/icon.svg"))
 
-        self.toolbar = QToolBar("ToolBar")
+        self.toolbar = QToolBar(" ")
 
         self.addToolBar(Qt.TopToolBarArea,self.toolbar)
 
@@ -33,8 +33,8 @@ class MainWindow(QMainWindow):
         self.toolbar.addWidget(spacer)
 
         self.guias_navegador = QToolBar()
-        self.toolbar.addWidget(self.guias_navegador)
         self.guias_navegador.setMovable(True)
+        self.addToolBar(Qt.BottomToolBarArea,self.guias_navegador)
 
         aba_1 = QToolButton()
         aba_1.setText('1')
@@ -102,7 +102,7 @@ class MainWindow(QMainWindow):
         voltar_botao.clicked.connect(self.browser.back)
         voltar_botao.setCursor(Qt.PointingHandCursor)
         voltar_botao.setObjectName("voltar_botao")  # Definindo um ID único para o botão
-        self.guias_navegador.addWidget(voltar_botao)
+        self.toolbar.addWidget(voltar_botao)
 
         # Botão Recarregar
         recarregar_botao = QToolButton()
@@ -110,7 +110,7 @@ class MainWindow(QMainWindow):
         recarregar_botao.clicked.connect(self.browser.reload)
         recarregar_botao.setCursor(Qt.PointingHandCursor)
         recarregar_botao.setObjectName("recarregar_botao")  # Definindo um ID único para o botão
-        self.guias_navegador.addWidget(recarregar_botao)
+        self.toolbar.addWidget(recarregar_botao)
 
         # Botão Home
         home_botao = QToolButton()
@@ -118,7 +118,7 @@ class MainWindow(QMainWindow):
         home_botao.clicked.connect(self.load_home)
         home_botao.setCursor(Qt.PointingHandCursor)
         home_botao.setObjectName("home_botao")  # Definindo um ID único para o botão
-        self.guias_navegador.addWidget(home_botao)
+        self.toolbar.addWidget(home_botao)
 
         # Botão Avançar
         avancar_botao = QToolButton()
@@ -127,12 +127,12 @@ class MainWindow(QMainWindow):
         avancar_botao.setCursor(Qt.PointingHandCursor)
         avancar_botao.setObjectName("avancar_botao")
         avancar_botao.setVisible(True)
-        self.guias_navegador.addWidget(avancar_botao)
+        self.toolbar.addWidget(avancar_botao)
 
         # Barra de pesquisa
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
-        self.guias_navegador.addWidget(self.urlbar)
+        self.toolbar.addWidget(self.urlbar)
 
         # Adiciona um espaço vazio para posicionar a barra lateral no final da página
         layout.addStretch()
@@ -144,7 +144,7 @@ class MainWindow(QMainWindow):
         abrir_barra_lateral.setCursor(Qt.PointingHandCursor)
         abrir_barra_lateral.setObjectName("abrir_barra_lateral")
         abrir_barra_lateral.setVisible(True)
-        self.guias_navegador.addWidget(abrir_barra_lateral)
+        self.toolbar.addWidget(abrir_barra_lateral)
 
         self.configuracaoBarra = QToolBar()
         self.configuracaoBarra.setIconSize(QSize(16, 16))
