@@ -49,13 +49,11 @@ class MainWindow(QMainWindow):
         self.tab_widget = QTabWidget()
         self.setCentralWidget(self.tab_widget)
 
-        # verifica aonde esta o     tab selecionado
-        self.tab_widget.currentChanged.connect(self.tab_changed)
-        self.tab_index = self.tab_widget.currentIndex()
-        print(f"Selected tab index: {self.tab_index}")
-
         self.barra_ferramentas = QToolBar()
         self.addToolBar(self.barra_ferramentas)
+
+        self.tab_widget.currentChanged(self.tab_changed)
+        self.tab_index = self.tab_widget.currentIndex()
 
         # Create QWidget for the first tab
         self.widget_1 = QWidget()
@@ -75,35 +73,11 @@ class MainWindow(QMainWindow):
         # Add the second widget to the QTabWidget
         self.tab_widget.addTab(self.widget_2, 'Tab 2')
 
-        # Botão Voltar
-        self.voltar_botao = QToolButton()
-        self.voltar_botao.setText('<')
-        self.voltar_botao.clicked.connect(self.navigate_back)
-        self.voltar_botao.setObjectName("voltar_botao")  # Definindo um ID único para o botão
-        self.barra_ferramentas.addWidget(self.voltar_botao)
-        # Botão Recarregar
-        self.recarregar_botao = QToolButton()
-        self.recarregar_botao.setText('R')
-        #self.recarregar_botao.clicked.connect()
-        self.recarregar_botao.setObjectName("recarregar_botao")  # Definindo um ID único para o botão
-        self.barra_ferramentas.addWidget(self.recarregar_botao)
-        # Botão Home
-        self.home_botao = QToolButton()
-        self.home_botao.setText('H')
-        # self.home_botao.clicked.connect()
-        self.home_botao.setObjectName("home_botao")  # Definindo um ID único para o botão
-        self.barra_ferramentas.addWidget(self.home_botao)
-        # Botão Avançar
-        self.avancar_botao = QToolButton()
-        self.avancar_botao.setText('>')
-        self.avancar_botao.clicked.connect(self.navigate_forward)
-        self.avancar_botao.setObjectName("avancar_botao")
-        self.avancar_botao.setVisible(True)
-        self.barra_ferramentas.addWidget(self.avancar_botao)
-        # Barra de pesquisa
-        self.urlbar = QLineEdit()
-        # self.urlbar.returnPressed.connect()
-        self.barra_ferramentas.addWidget(self.urlbar)
+        self.criar_barra_de_ferramentas() # Cria barra de ferramentas
+
+        # verifica aonde esta o     tab selecionado
+        self.tab_index = self.tab_widget.currentIndex()
+        print(f"Selected tab index: {self.tab_index}")
 
         # Add a button to create a new tab
         self.new_tab_button = QPushButton('New Tab')
@@ -115,35 +89,51 @@ class MainWindow(QMainWindow):
         # Set the QTabWidget as the central widget of the QMainWindow
         self.setCentralWidget(self.tab_widget)
 
-    def navigate_back(self):
-        current_index = self.tab_widget.currentIndex()
-        current_widget = self.tab_widget.widget(current_index)
-        browser = current_widget.findChild(self.browser)  # Use QWebEngineView se estiver usando PyQt5 >= 5.12
-        browser.back()
+    def criar_barra_de_ferramentas(self):
 
-    def reload_page(self):
-        current_index = self.tab_widget.currentIndex()
-        current_widget = self.tab_widget.widget(current_index)
-        browser = current_widget.findChild(self.browser)  # Use QWebEngineView se estiver usando PyQt5 >= 5.12
-        browser.reload()
+        # Botão Voltar
+        self.voltar_botao = QToolButton()
+        self.voltar_botao.setText('<')
+        self.voltar_botao.clicked.connect(self.navigate_back)
+        self.voltar_botao.setObjectName("voltar_botao")  # Definindo um ID único para o botão
+        self.barra_ferramentas.addWidget(self.voltar_botao)
+        # Botão Recarregar
+        self.recarregar_botao = QToolButton()
+        self.recarregar_botao.setText('R')
+        self.recarregar_botao.clicked.connect(self.navigate_reload)
+        self.recarregar_botao.setObjectName("recarregar_botao")  # Definindo um ID único para o botão
+        self.barra_ferramentas.addWidget(self.recarregar_botao)
+        # Botão Home
+        self.home_botao = QToolButton()
+        self.home_botao.setText('H')
+        self.home_botao.clicked.connect(self.load_home)
+        self.home_botao.setObjectName("home_botao")  # Definindo um ID único para o botão
+        self.barra_ferramentas.addWidget(self.home_botao)
+        # Botão Avançar
+        self.avancar_botao = QToolButton()
+        self.avancar_botao.setText('>')
+        self.avancar_botao.clicked.connect(self.navigate_forward)
+        self.avancar_botao.setObjectName("avancar_botao")
+        self.avancar_botao.setVisible(True)
+        self.barra_ferramentas.addWidget(self.avancar_botao)
+        # Barra de pesquisa
+        self.urlbar = QLineEdit()
+        self.urlbar.returnPressed.connect(self.navigate_to_url)
+        self.barra_ferramentas.addWidget(self.urlbar)
+
+    def navigate_reload(self):
+        self.tab_index = self.tab_widget.currentIndex()
+        self.browser[self.tab_index].reload()
+    def navigate_back(self):
+        self.tab_index = self.tab_widget.currentIndex()
+        self.browser[self.tab_index].back()
 
     def navigate_forward(self):
-        current_index = self.tab_widget.currentIndex()
-        current_widget = self.tab_widget.widget(current_index)
-        browser = current_widget.findChild(self.browser)  # Use QWebEngineView se estiver usando PyQt5 >= 5.12
-        browser.forward()
-
-    def load_home(self):
-        current_index = self.tab_widget.currentIndex()
-        current_widget = self.tab_widget.widget(current_index)
-        browser = current_widget.findChild(self.browser)  # Use QWebEngineView se estiver usando PyQt5 >= 5.12
-        browser.setUrl(QUrl("http://www.example.com"))  # Substitua pela sua URL inicial
+        self.tab_index = self.tab_widget.currentIndex()
+        self.browser[self.tab_index].forward()
 
     def tab_changed(self):
-        self.tab_index = self.tab_widget.currentIndex()
-
-        print(f"Selected tab: {self.tab_widget.currentIndex()}")
-
+        pass # adiciona coisinhas para atualizar a url
     def add_new_tab(self):
         # Create a new QWebEngineView
         browser = QWebEngineView()
@@ -245,28 +235,31 @@ class MainWindow(QMainWindow):
         else:
             self.status_bar.showMessage("Loading... {}%".format(progress))
     def navigate_to_url(self):
+        self.tab_index = self.tab_widget.currentIndex()
         q = QUrl(self.urlbar.text())
         if q.scheme() == "":
             search_query = q.toString().replace(" ", "+")
             url = f"https://www.google.com/search?q={search_query}"
-            self.browser[1].setUrl(QUrl(url))
+            self.browser[self.tab_index].setUrl(QUrl(url))
         else:
-            self.browser[1].setUrl(q)
+            self.browser[self.tab_index].setUrl(q)
         # Adiciona ao historico de pesquisa
         h = self.historico_de_pesquisa
         if len(h) == 0 or h[-1] != q.toString:
             h.append(q.toString())
     def update_urlbar(self, q):
-        self.urlbar[1].setText(q.toString())
-        self.urlbar[1].setCursorPosition(0)
+        self.tab_index = self.tab_widget.currentIndex()
+        self.urlbar[self.tab_index].setText(q.toString())
+        self.urlbar[self.tab_index].setCursorPosition(0)
     def load_home(self):
-        self.browser[1].setUrl(QUrl("http://www.google.com"))
+        self.tab_index = self.tab_widget.currentIndex()
+        self.browser[self.tab_index].setUrl(QUrl("http://www.google.com"))
     def update_title(self):
-        title = self.browser[1].page().title()
+        title = self.browser[self.tab_index].page().title()
         self.setWindowTitle(f"Gallifrey - {title}")
 
         # Adiciona ao historico de pesquisa
-        q = QUrl(self.urlbar[1].text())
+        q = QUrl(self.urlbar[0].text())
         h = self.historico
         data = datetime.now()
         pagina = [title, q.toString(), data.strftime("%d/%m/%Y")]
