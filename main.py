@@ -90,7 +90,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.tab_widget)
 
     def criar_barra_de_ferramentas(self):
-
         # Botão Voltar
         self.voltar_botao = QToolButton()
         self.voltar_botao.setText('<')
@@ -120,7 +119,6 @@ class MainWindow(QMainWindow):
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         self.barra_ferramentas.addWidget(self.urlbar)
-
     def navigate_reload(self):
         self.tab_index = self.tab_widget.currentIndex()
         self.browser[self.tab_index].reload()
@@ -133,19 +131,31 @@ class MainWindow(QMainWindow):
         self.browser[self.tab_index].forward()
 
     def tab_changed(self):
-        pass # adiciona coisinhas para atualizar a url
+        for i, browser in enumerate(self.browser):
+            browser.titleChanged.connect(lambda title, index=i: self.update_tab_title(index, title))
+
+    def update_tab_title(self, index, title):
+        if len(title) > 5:
+            title = title[:5]
+        self.tab_widget.setTabText(index, title)
+
     def add_new_tab(self):
+        # Aumentar o tamanho da lista para incluir um novo elemento
+        self.browser.append(QWebEngineView())
+
         # Create a new QWebEngineView
-        browser = QWebEngineView()
-        browser.setUrl(QUrl("http://www.google.com"))
+        new_browser = self.browser[len(self.browser) - 1]
+        new_browser.setUrl(QUrl("http://www.google.com"))
+
+        print(len(self.browser))
 
         # Definindo as preferências do navegador
-        settings = browser.settings()
+        settings = new_browser.settings()
         settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)
         settings.setAttribute(QWebEngineSettings.AutoLoadImages, True)
         settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
         settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
-        settings.setAttribute(QWebEngineSettings.JavascriptCanAccessClipboard, True)
+        settings.setAttribute(QWebEngineSettings.JavascriptCanAccessClipboard,  True)
         settings.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows, True)
         settings.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows, True)
         settings.setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, True)
@@ -154,22 +164,22 @@ class MainWindow(QMainWindow):
         # Create a new QWidget for the new tab
         new_widget = QWidget()
         new_layout = QVBoxLayout(new_widget)
-        new_layout.addWidget(browser)
+        new_layout.addWidget(new_browser)
 
         close_button = QToolButton()
         close_button.setText('X')
         close_button.setStyleSheet('QToolButton { border: none; }')
         close_button.clicked.connect(new_widget.close)
-        new_layout.addWidget(close_button, alignment=Qt.AlignRight)
+        self.barra_ferramentas.addWidget(close_button)
 
         # Create a horizontal layout for the new widget and close button
-        layout = QHBoxLayout()
-        layout.addWidget(new_widget)
-        layout.addWidget(close_button)
+        self.layout = QHBoxLayout()
+        self.layout.addWidget(new_widget)
+        self.layout.addWidget(close_button)
 
         # Add the new tab to the QTabWidget
         self.tab_widget.addTab(QWidget(), 'Nova tab')
-        self.tab_widget.widget(self.tab_widget.count() - 1).setLayout(layout)
+        self.tab_widget.widget(self.tab_widget.count() - 1).setLayout(self.layout)
 
     def BrowserTab(self):
         # Definindo as preferências do navegador
