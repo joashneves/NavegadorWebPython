@@ -125,19 +125,21 @@ class MainWindow(QMainWindow):
     def navigate_back(self):
         self.tab_index = self.tab_widget.currentIndex()
         self.browser[self.tab_index].back()
-
     def navigate_forward(self):
         self.tab_index = self.tab_widget.currentIndex()
         self.browser[self.tab_index].forward()
-
     def tab_changed(self):
+        self.tab_index = self.tab_widget.currentIndex()
         for i, browser in enumerate(self.browser):
             browser.titleChanged.connect(lambda title, index=i: self.update_tab_title(index, title))
+        self.browser[self.tab_index ].urlChanged.connect(self.update_urlbar)
 
     def update_tab_title(self, index, title):
         if len(title) > 5:
             title = title[:5]
         self.tab_widget.setTabText(index, title)
+
+        self.update_title()
 
     def add_new_tab(self):
         # Aumentar o tamanho da lista para incluir um novo elemento
@@ -180,7 +182,6 @@ class MainWindow(QMainWindow):
         # Add the new tab to the QTabWidget
         self.tab_widget.addTab(QWidget(), 'Nova tab')
         self.tab_widget.widget(self.tab_widget.count() - 1).setLayout(self.layout)
-
     def BrowserTab(self):
         # Definindo as preferências do navegador
         settings = self.browser.settings()
@@ -258,18 +259,19 @@ class MainWindow(QMainWindow):
         if len(h) == 0 or h[-1] != q.toString:
             h.append(q.toString())
     def update_urlbar(self, q):
-        self.tab_index = self.tab_widget.currentIndex()
-        self.urlbar[self.tab_index].setText(q.toString())
-        self.urlbar[self.tab_index].setCursorPosition(0)
+        print()
+        pass
+        print(q.toString())
+        self.urlbar.setText(q.toString())
+        self.urlbar.setCursorPosition(0)
     def load_home(self):
         self.tab_index = self.tab_widget.currentIndex()
         self.browser[self.tab_index].setUrl(QUrl("http://www.google.com"))
     def update_title(self):
         title = self.browser[self.tab_index].page().title()
         self.setWindowTitle(f"Gallifrey - {title}")
-
         # Adiciona ao historico de pesquisa
-        q = QUrl(self.urlbar[0].text())
+        q = QUrl(self.urlbar.text())
         h = self.historico
         data = datetime.now()
         pagina = [title, q.toString(), data.strftime("%d/%m/%Y")]
