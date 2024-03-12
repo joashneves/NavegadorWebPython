@@ -52,7 +52,7 @@ class MainWindow(QMainWindow):
         self.barra_ferramentas = QToolBar()
         self.addToolBar(self.barra_ferramentas)
 
-        self.tab_widget.currentChanged(self.tab_changed)
+        self.tab_widget.currentChanged.connect(self.tab_changed)
         self.tab_index = self.tab_widget.currentIndex()
 
         # Create QWidget for the first tab
