@@ -47,6 +47,8 @@ class MainWindow(QMainWindow):
     def init_ui(self):
         # Create QTabWidget
         self.tab_widget = QTabWidget()
+        self.tab_widget.setDocumentMode(True)
+        self.tab_widget.setTabsClosable(True)
         self.setCentralWidget(self.tab_widget)
 
         self.barra_ferramentas = QToolBar()
@@ -133,14 +135,8 @@ class MainWindow(QMainWindow):
         for i, browser in enumerate(self.browser):
             browser.titleChanged.connect(lambda title, index=i: self.update_tab_title(index, title))
         self.browser[self.tab_index ].urlChanged.connect(self.update_urlbar)
-
-    def update_tab_title(self, index, title):
-        if len(title) > 5:
-            title = title[:5]
-        self.tab_widget.setTabText(index, title)
-
-        self.update_title()
-
+    def tab_closed(self, index):
+        self.tab_widget.removeTab(index)
     def add_new_tab(self):
         # Aumentar o tamanho da lista para incluir um novo elemento
         self.browser.append(QWebEngineView())
@@ -168,20 +164,22 @@ class MainWindow(QMainWindow):
         new_layout = QVBoxLayout(new_widget)
         new_layout.addWidget(new_browser)
 
-        close_button = QToolButton()
-        close_button.setText('X')
-        close_button.setStyleSheet('QToolButton { border: none; }')
-        close_button.clicked.connect(new_widget.close)
-        self.barra_ferramentas.addWidget(close_button)
+        self.tab_widget.tabCloseRequested.connect(self.tab_closed)
 
         # Create a horizontal layout for the new widget and close button
         self.layout = QHBoxLayout()
         self.layout.addWidget(new_widget)
-        self.layout.addWidget(close_button)
 
         # Add the new tab to the QTabWidget
         self.tab_widget.addTab(QWidget(), 'Nova tab')
         self.tab_widget.widget(self.tab_widget.count() - 1).setLayout(self.layout)
+    def update_tab_title(self, index, title):
+        if len(title) > 5:
+            title = title[:5]
+        self.tab_widget.setTabText(index, title)
+
+        self.update_title()
+
     def BrowserTab(self):
         # Definindo as preferências do navegador
         settings = self.browser.settings()
