@@ -45,6 +45,7 @@ class MainWindow(QMainWindow):
         criar_guia_navegador = QToolButton()
         criar_guia_navegador.setText('+')
         criar_guia_navegador.setObjectName("criar_guia_navegador")  # Definindo um ID único para o botão
+        criar_guia_navegador.clicked.connect(self.Criar_Pagina)
         self.guias_navegador.addWidget(criar_guia_navegador)
 
         self.BrowserTab() # chama browser
@@ -216,6 +217,12 @@ class MainWindow(QMainWindow):
         if len(h) == 0 or h[-1] != pagina:
             h.append(pagina)
         print(h)
+
+    def Criar_Pagina(self):
+        aba_1 = QToolButton()
+        aba_1.setText('1')
+        self.guias_navegador.addWidget(aba_1)
+
 app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
