@@ -15,9 +15,16 @@ class MainWindow(QMainWindow):
     historico = []
     def __init__(self):
         super().__init__()
+
         self.browser = QWebEngineView()
         self.browser.setUrl(QUrl("http://www.google.com"))
 
+        self.browser1 = QWebEngineView()
+        self.browser1.setUrl(QUrl("http://www.google.com"))
+
+        self.init_ui()
+
+        """
         #Titulo
         self.setGeometry(0,0,800,600)
         self.setWindowIcon(QIcon("./img/icon.svg"))
@@ -36,9 +43,6 @@ class MainWindow(QMainWindow):
         self.guias_navegador.setMovable(True)
         self.addToolBar(Qt.BottomToolBarArea,self.guias_navegador)
 
-        aba_1 = QToolButton()
-        aba_1.setText('1')
-        self.guias_navegador.addWidget(aba_1)
 
         self.guias_navegador.addSeparator()
 
@@ -63,7 +67,29 @@ class MainWindow(QMainWindow):
 
         # Loading progress
         if(self.browser.loadProgress):
-            self.browser.loadProgress.connect(self.update_loading_progress)
+            self.browser.loadProgress.connect(self.update_loading_progress)"""
+
+    def init_ui(self):
+
+        # Create a QTabWidget as the central widget of the QMainWindow
+        tab_widget = QTabWidget()
+        self.setCentralWidget(tab_widget)
+
+
+        # Create a QWidget for the first tab
+        widget_1 = QWidget()
+        layout_1 = QVBoxLayout(widget_1)
+        layout_1.addWidget(self.browser1)
+        tab_widget.addTab(widget_1, 'Tab 1')
+
+        # Create a QWidget for the second tab
+        widget_2 = QWidget()
+        layout_2 = QVBoxLayout(widget_2)
+        layout_2.addWidget(self.browser)
+        tab_widget.addTab(widget_2, 'Tab 2')
+
+        # Set the QTabWidget as the central widget of the QMainWindow
+        self.setCentralWidget(tab_widget)
 
     def BrowserTab(self):
         # Definindo as preferências do navegador
