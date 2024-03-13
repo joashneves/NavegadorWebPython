@@ -65,7 +65,6 @@ class MainWindow(QMainWindow):
 
         # Add the first widget to the QTabWidget
         self.tab_widget.addTab(self.widget_1, 'Tab 1')
-
         # Create QWidget for the second tab
         self.widget_2 = QWidget()
         self.layout_2 = QVBoxLayout(self.widget_2)
@@ -82,7 +81,8 @@ class MainWindow(QMainWindow):
         print(f"Selected tab index: {self.tab_index}")
 
         # Add a button to create a new tab
-        self.new_tab_button = QPushButton('New Tab')
+        self.new_tab_button = QPushButton('+')
+        self.new_tab_button.setObjectName("Adicionar_Tab")
         self.new_tab_button.clicked.connect(self.add_new_tab)
 
         # Adicionar o botão de fechar da primeira aba
@@ -90,7 +90,6 @@ class MainWindow(QMainWindow):
 
         # Set the QTabWidget as the central widget of the QMainWindow
         self.setCentralWidget(self.tab_widget)
-
     def criar_barra_de_ferramentas(self):
         # Botão Voltar
         self.voltar_botao = QToolButton()
@@ -170,12 +169,13 @@ class MainWindow(QMainWindow):
         self.layout = QHBoxLayout()
         self.layout.addWidget(new_widget)
 
-        # Add the new tab to the QTabWidget
+        # adiciona um nova Tab ao QTabWidget
         self.tab_widget.addTab(QWidget(), 'Nova tab')
         self.tab_widget.widget(self.tab_widget.count() - 1).setLayout(self.layout)
+
     def update_tab_title(self, index, title):
-        if len(title) > 5:
-            title = title[:5]
+        if len(title) > 15:
+            title = title[:15]
         self.tab_widget.setTabText(index, title)
 
         self.update_title()

@@ -1,8 +1,10 @@
 /* style.css */
-QWebEngineView{
-    background-color: black;
-}
-.configuracao_barra_lateral{
+QWebEngineView {
+    border-radius: 12px;
+    margin: 0px;
+    padding: 0px;
+ }
+#configuracao_barra_lateral{
     background-color: white;
 }
 QMainWindow { /* Barra de ferramentas */
@@ -18,7 +20,6 @@ QLineEdit:hover { /* Barra de pesquisa */
     background-color: rgba(255, 255, 255, 250);
 }
 QToolBar { /* Barra de ferramentas */
-    display : flex;
     background-color: #50237d;
     border: none;
     cursor: pointer;
@@ -41,38 +42,51 @@ QToolButton:hover {
 QToolButton:pressed {
     background-color: #d9d2e9;
 }
-QComboBox{
-    subcontrol-origin: padding;
-    subcontrol-position: top right;
-    selection-background-color: #111;
-    selection-color: yellow;
-    color: white;
-    background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #565656, stop: 0.1 #525252, stop: 0.5 #4e4e4e, stop: 0.9 #4a4a4a, stop: 1 #464646);
-    border-style: solid;
-    border: 1px solid #1e1e1e;
-    border-radius: 5;
-    padding: 1px 0px 1px 20px;
+QTabWidget{
+    background-color: #d9d2e9;
 }
-QComboBox:hover, QPushButton:hover
-{
-    border: 1px solid black;
-    color: white;
+ /* Barra de guias*/
+QTabBar{
+    background-color:#50237d;
 }
-QComboBox QAbstractItemView
-{
+QTabBar::tab {
+    background-color: #50237d;
+    color: #fff;
+    padding: 8px 20px; /* 1: baixo 2: lado esquerdo*/
+    padding-left: 2px; /* cresce pro lado esquerdo */
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    padding-right:100px;
+}
+QTabBar::close-button {
+    border: 1px solid;
+    border-radius:3px;
+}
+
+QTabBar::close-button:hover{
+    background-color: #Fbb;
+}
+
+QTabBar::tab:!selected:hover{
+    background-color: #8e7cc3;
+}
+
+QTabBar::tab:selected{
+    background-color: #41166b;
     border: 2px solid black;
-    color: black;
-    selection-background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #8A2BE2, stop: 1 #483D8B);
+    border-color: black black #41166b black;
 }
-QComboBox::drop-down
-{
-     subcontrol-origin: padding;
-     subcontrol-position: top right;
-     color: white;
-     border-left-width: 0px;
-     border-left-color: darkgray;
-     border-left-style: solid; /* just a single line */
-     border-top-right-radius: 3px; /* same radius as the QComboBox */
-     border-bottom-right-radius: 3px;
-     padding-left: 10px;
- }
+QPushButton{
+    background-color: #20124d;
+    margin 2px;
+    color: white;
+}
+QPushButton:hover {
+    background-color:  #8e7cc3;
+    border: 2px solid white;
+    border-radius: 10px;
+    cursor: pointer;
+}
+QPushButton:pressed {
+    background-color: #d9d2e9;
+}
