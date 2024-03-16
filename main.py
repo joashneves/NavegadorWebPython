@@ -143,7 +143,7 @@ class MainWindow(QMainWindow):
     def tab_closed(self, index):
         self.tab_widget.removeTab(index)
         self.browser[index].close()
-         #self.browser.remove(index)
+        del(self.browser[index])
     def add_new_tab(self):
         # Aumentar o tamanho da lista para incluir um novo elemento
         self.browser.append(QWebEngineView())
