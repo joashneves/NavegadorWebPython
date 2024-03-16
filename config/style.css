@@ -53,10 +53,9 @@ QTabBar::tab {
     background-color: #50237d;
     color: #fff;
     padding: 8px 20px; /* 1: baixo 2: lado esquerdo*/
-    padding-left: 2px; /* cresce pro lado esquerdo */
+    padding-left: 8px; /* cresce pro lado esquerdo */
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
-    padding-right:100px;
 }
 QTabBar::close-button {
     border: 1px solid;

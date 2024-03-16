@@ -133,9 +133,17 @@ class MainWindow(QMainWindow):
         self.tab_index = self.tab_widget.currentIndex()
         for i, browser in enumerate(self.browser):
             browser.titleChanged.connect(lambda title, index=i: self.update_tab_title(index, title))
-        self.browser[self.tab_index ].urlChanged.connect(self.update_urlbar)
+            # Atualizar a URL do QWebEngineView correspondente à aba selecionada
+        try:
+            q_url = self.browser[self.tab_index].url()
+            self.update_urlbar(q_url)
+            print(f"alterado {q_url.toString()}")
+        except Exception as ex:
+            print(f"Não consegui acessar a pagina {ex}")
     def tab_closed(self, index):
         self.tab_widget.removeTab(index)
+        self.browser[index].close()
+         #self.browser.remove(index)
     def add_new_tab(self):
         # Aumentar o tamanho da lista para incluir um novo elemento
         self.browser.append(QWebEngineView())
@@ -174,10 +182,11 @@ class MainWindow(QMainWindow):
         self.tab_widget.widget(self.tab_widget.count() - 1).setLayout(self.layout)
 
     def update_tab_title(self, index, title):
-        if len(title) > 15:
-            title = title[:15]
+        if len(title) > 26:
+            title = title[:26]
         self.tab_widget.setTabText(index, title)
-
+        q_url = self.browser[self.tab_index].url()
+        self.update_urlbar(q_url)
         self.update_title()
 
     def BrowserTab(self):
@@ -257,8 +266,6 @@ class MainWindow(QMainWindow):
         if len(h) == 0 or h[-1] != q.toString:
             h.append(q.toString())
     def update_urlbar(self, q):
-        print()
-        pass
         print(q.toString())
         self.urlbar.setText(q.toString())
         self.urlbar.setCursorPosition(0)
