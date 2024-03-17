@@ -161,7 +161,11 @@ class MainWindow(QMainWindow):
     def tab_closed(self, index):
         self.tab_widget.removeTab(index)
         self.browser[index].close()
-        del(self.browser[index])
+        del self.browser[index]
+        self.reorganize_tabs()
+    def reorganize_tabs(self):
+        for i in range(len(self.browser)):
+            self.tab_widget.setTabText(i, f'Tab {i+1}')
     def add_new_tab(self):
         # Aumentar o tamanho da lista para incluir um novo elemento
         self.browser.append(QWebEngineView())
@@ -190,14 +194,8 @@ class MainWindow(QMainWindow):
         new_layout.addWidget(new_browser)
 
         self.tab_widget.tabCloseRequested.connect(self.tab_closed)
-
-        # Create a horizontal layout for the new widget and close button
-        self.layout = QHBoxLayout()
-        self.layout.addWidget(new_widget)
-
-        # adiciona um nova Tab ao QTabWidget
-        self.tab_widget.addTab(QWidget(), 'Nova tab')
-        self.tab_widget.widget(self.tab_widget.count() - 1).setLayout(self.layout)
+        # Add the new tab to the QTabWidget
+        self.tab_widget.addTab(new_widget, 'Nova tab')
 
     def update_tab_title(self, index, title):
         if len(title) > 26:
