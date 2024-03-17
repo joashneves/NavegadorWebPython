@@ -33,9 +33,6 @@ class MainWindow(QMainWindow):
         with open("config/style.css", "r") as f:
             self.setStyleSheet(f.read())
         """
-        # Load home page on startup
-        self.load_home()
-
         # Status bar
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
@@ -120,6 +117,27 @@ class MainWindow(QMainWindow):
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         self.barra_ferramentas.addWidget(self.urlbar)
+
+        self.abrir_barra_lateral = QToolButton()
+        self.abrir_barra_lateral.setIcon(QIcon('./img/barra.svg'))
+        self.abrir_barra_lateral.clicked.connect(self.mostrar_barra_lateral)
+        self.abrir_barra_lateral.setCursor(Qt.PointingHandCursor)
+        self.abrir_barra_lateral.setObjectName("abrir_barra_lateral")
+        self.abrir_barra_lateral.setVisible(True)
+        self.barra_ferramentas.addWidget(self.abrir_barra_lateral)
+
+        # Configuração da barra lateral
+        self.configuracaoBarra = QToolBar()
+        self.addToolBar(Qt.RightToolBarArea, self.configuracaoBarra)
+        self.configuracaoBarra.setCursor(Qt.PointingHandCursor)
+        self.configuracaoBarra.setVisible(True)
+
+        self.congiguracao_navegador = QToolButton()
+        self.congiguracao_navegador.setIcon(QIcon('./img/config.svg'))
+        self.congiguracao_navegador.setCheckable(True)
+        self.configuracaoBarra.addWidget(self.congiguracao_navegador)
+        self.congiguracao_navegador.setCursor(Qt.PointingHandCursor)
+
     def navigate_reload(self):
         self.tab_index = self.tab_widget.currentIndex()
         self.browser[self.tab_index].reload()
@@ -216,26 +234,7 @@ class MainWindow(QMainWindow):
         # Evento para mostrar o QWebEngineView quando o mouse estiver próximo
         self.centralWidget().setMouseTracking(True)
         self.centralWidget().installEventFilter(self)
-
-        """        # Configuração da barra lateral
-        abrir_barra_lateral = QToolButton()
-        abrir_barra_lateral.setIcon(QIcon('./img/settings.svg'))
-        abrir_barra_lateral.clicked.connect(self.mostrar_barra_lateral)
-        abrir_barra_lateral.setCursor(Qt.PointingHandCursor)
-        abrir_barra_lateral.setObjectName("abrir_barra_lateral")
-        abrir_barra_lateral.setVisible(True)
-        self.barra_ferramentas.addWidget(abrir_barra_lateral)
-
-        self.configuracaoBarra = QToolBar()
-        self.configuracaoBarra.setIconSize(QSize(16, 16))
-        self.addToolBar(Qt.RightToolBarArea, self.configuracaoBarra)
-        self.configuracaoBarra.setVisible(False)
-
-        button_action = QAction(QIcon("/img/settings.svg"), "Config's", self)
-        button_action.setStatusTip("This is your button")
-        button_action.setCheckable(True)
-        self.configuracaoBarra.addAction(button_action)
-
+        """
         button_action2 = QAction(QIcon("/img/settings.svg"), "Fav's", self)
         button_action2.setStatusTip("This is your button2")
 
