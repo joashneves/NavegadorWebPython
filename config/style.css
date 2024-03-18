@@ -1,4 +1,7 @@
 /* style.css */
+  QMainWindow {
+    background-color: #41166b; /* Cor de fundo da barra de título */
+ }
 QWebEngineView {
     border-radius: 12px;
     margin: 0px;
@@ -26,7 +29,8 @@ QToolBar { /* Barra de ferramentas */
 }
 QToolButton {
     background-color: #20124d;
-    border: 2px solid black;
+    background-radius: 100%;
+    border: 100% solid black;
     padding: 4px 4px;
     border-radius: 12px;
     margin 2px;
@@ -35,7 +39,7 @@ QToolButton {
 }
 QToolButton:hover {
     background-color:  #8e7cc3;
-    border: 2px solid white;
+    border: 100% solid white;
     border-radius: 10px;
     cursor: pointer;
 }

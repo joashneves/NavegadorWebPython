@@ -78,9 +78,11 @@ class MainWindow(QMainWindow):
         print(f"Selected tab index: {self.tab_index}")
 
         # Add a button to create a new tab
-        self.new_tab_button = QPushButton('+')
+        self.new_tab_button = QPushButton()
         self.new_tab_button.setObjectName("Adicionar_Tab")
+        self.new_tab_button.setIcon(QIcon('./img/barra.svg'))
         self.new_tab_button.clicked.connect(self.add_new_tab)
+        self.new_tab_button.setToolTip("Adicionar Nova Aba")  # Definindo o texto da dica de ferramenta
 
         # Adicionar o botão de fechar da primeira aba
         self.tab_widget.setCornerWidget(self.new_tab_button, Qt.TopRightCorner)
@@ -92,24 +94,28 @@ class MainWindow(QMainWindow):
         self.voltar_botao = QToolButton()
         self.voltar_botao.setText('<')
         self.voltar_botao.clicked.connect(self.navigate_back)
+        self.voltar_botao.setToolTip("Voltar")
         self.voltar_botao.setObjectName("voltar_botao")  # Definindo um ID único para o botão
         self.barra_ferramentas.addWidget(self.voltar_botao)
         # Botão Recarregar
         self.recarregar_botao = QToolButton()
         self.recarregar_botao.setText('R')
         self.recarregar_botao.clicked.connect(self.navigate_reload)
+        self.recarregar_botao.setToolTip("Recarregar")
         self.recarregar_botao.setObjectName("recarregar_botao")  # Definindo um ID único para o botão
         self.barra_ferramentas.addWidget(self.recarregar_botao)
         # Botão Home
         self.home_botao = QToolButton()
         self.home_botao.setText('H')
         self.home_botao.clicked.connect(self.load_home)
+        self.home_botao.setToolTip("Botão de Home")
         self.home_botao.setObjectName("home_botao")  # Definindo um ID único para o botão
         self.barra_ferramentas.addWidget(self.home_botao)
         # Botão Avançar
         self.avancar_botao = QToolButton()
         self.avancar_botao.setText('>')
         self.avancar_botao.clicked.connect(self.navigate_forward)
+        self.avancar_botao.setToolTip("Avançar")
         self.avancar_botao.setObjectName("avancar_botao")
         self.avancar_botao.setVisible(True)
         self.barra_ferramentas.addWidget(self.avancar_botao)
@@ -118,10 +124,18 @@ class MainWindow(QMainWindow):
         self.urlbar.returnPressed.connect(self.navigate_to_url)
         self.barra_ferramentas.addWidget(self.urlbar)
 
+        self.favoritar = QToolButton()
+        self.favoritar.setIcon(QIcon('./img/config.svg'))
+        self.favoritar.setToolTip("Favoritar")
+        self.favoritar.setCheckable(True)
+        self.barra_ferramentas.addWidget(self.favoritar)
+        self.favoritar.setCursor(Qt.PointingHandCursor)
+
         self.abrir_barra_lateral = QToolButton()
         self.abrir_barra_lateral.setIcon(QIcon('./img/barra.svg'))
         self.abrir_barra_lateral.clicked.connect(self.mostrar_barra_lateral)
         self.abrir_barra_lateral.setCursor(Qt.PointingHandCursor)
+        self.abrir_barra_lateral.setToolTip("Barra lateral")
         self.abrir_barra_lateral.setObjectName("abrir_barra_lateral")
         self.abrir_barra_lateral.setVisible(True)
         self.barra_ferramentas.addWidget(self.abrir_barra_lateral)
@@ -134,9 +148,19 @@ class MainWindow(QMainWindow):
 
         self.congiguracao_navegador = QToolButton()
         self.congiguracao_navegador.setIcon(QIcon('./img/config.svg'))
+        self.congiguracao_navegador.setToolTip("Configuração")
         self.congiguracao_navegador.setCheckable(True)
         self.configuracaoBarra.addWidget(self.congiguracao_navegador)
         self.congiguracao_navegador.setCursor(Qt.PointingHandCursor)
+
+        self.historico_botton = QToolButton()
+        self.historico_botton.setIcon(QIcon('./img/config.svg'))
+        self.historico_botton.setToolTip("Historico")
+        self.historico_botton.setCheckable(True)
+        self.configuracaoBarra.addWidget(self.historico_botton)
+        self.historico_botton.setCursor(Qt.PointingHandCursor)
+
+        self.configuracaoBarra.addSeparator()
 
     def navigate_reload(self):
         self.tab_index = self.tab_widget.currentIndex()
