@@ -81,7 +81,7 @@ class MainWindow(QMainWindow):
         self.new_tab_button = QPushButton()
         self.new_tab_button.setObjectName("Adicionar_Tab")
         self.new_tab_button.setIcon(QIcon('./img/barra.svg'))
-        self.new_tab_button.clicked.connect(self.add_new_tab)
+        self.new_tab_button.clicked.connect(lambda: self.add_new_tab("http://www.google.com"))
         self.new_tab_button.setToolTip("Adicionar Nova Aba")  # Definindo o texto da dica de ferramenta
 
         # Adicionar o botão de fechar da primeira aba
@@ -192,13 +192,14 @@ class MainWindow(QMainWindow):
     def reorganize_tabs(self):
         for i in range(len(self.browser)):
             self.tab_widget.setTabText(i, f'Tab {i+1}')
-    def add_new_tab(self):
+    def add_new_tab(self, link):
         # Aumentar o tamanho da lista para incluir um novo elemento
         self.browser.append(QWebEngineView())
 
         # Create a new QWebEngineView
         new_browser = self.browser[len(self.browser) - 1]
-        new_browser.setUrl(QUrl("http://www.google.com"))
+        new_browser.setUrl(QUrl(link))
+        page_title = new_browser.page().title()
 
         print(len(self.browser))
 
@@ -221,7 +222,7 @@ class MainWindow(QMainWindow):
 
         self.tab_widget.tabCloseRequested.connect(self.tab_closed)
         # Add the new tab to the QTabWidget
-        self.tab_widget.addTab(new_widget, 'Nova tab')
+        self.tab_widget.addTab(new_widget, 'Nova aba')
 
     def update_tab_title(self, index, title):
         if len(title) > 26:
@@ -237,16 +238,20 @@ class MainWindow(QMainWindow):
 
         # Obtém o ícone da página atual
         page_icon = current_browser.page().icon()
+        page_title = current_browser.page().title()
+        page_link = current_browser.page().url()
 
         # Verifica se o ícone é válido
         if not page_icon.isNull():
             # Cria um botão de ferramenta para o favorito
             self.favorito_site = QToolButton()
             self.favorito_site.setIcon(QIcon(page_icon))
-            self.favorito_site.setToolTip("Descrição do favorito")
+            self.favorito_site.setToolTip(f"{page_title}")
+            self.favorito_site.clicked.connect(lambda: self.add_new_tab(page_link))
             self.favorito_site.setCheckable(True)
             self.configuracaoBarra.addWidget(self.favorito_site)
             self.favorito_site.setCursor(Qt.PointingHandCursor)
+
 
     def BrowserTab(self):
         # Definindo as preferências do navegador
