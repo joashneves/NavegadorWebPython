@@ -24,3 +24,15 @@ Não que eu tenha terminado todos, porem são os que eu quero fazer e terminar
  - Terminal para javascrip e inspenciona web
  - Dicionario
  - Configurações do navegador em html
+
+#### TODO
+
+ - [x] Abrir a Web
+ - [ ] Histórico de navegação
+ - [ ] Favoritos
+ - [ ] Abas
+ - [x] Pesquisa
+ - [ ] Bloqueio de pop-ups e anúncios
+ - [ ] Terminal para javascrip e inspenciona web
+ - [ ] Dicionario
+ - [ ] Configurações do navegador em html
