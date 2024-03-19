@@ -128,6 +128,7 @@ class MainWindow(QMainWindow):
         self.favoritar.setIcon(QIcon('./img/config.svg'))
         self.favoritar.setToolTip("Favoritar")
         self.favoritar.setCheckable(True)
+        self.favoritar.clicked.connect(self.add_fav)
         self.barra_ferramentas.addWidget(self.favoritar)
         self.favoritar.setCursor(Qt.PointingHandCursor)
 
@@ -183,6 +184,7 @@ class MainWindow(QMainWindow):
         except Exception as ex:
             print(f"Não consegui acessar a pagina {ex}")
     def tab_closed(self, index):
+        print(index)
         self.tab_widget.removeTab(index)
         self.browser[index].close()
         del self.browser[index]
@@ -228,6 +230,23 @@ class MainWindow(QMainWindow):
         q_url = self.browser[self.tab_index].url()
         self.update_urlbar(q_url)
         self.update_title()
+
+    def add_fav(self):
+        self.tab_index = self.tab_widget.currentIndex()
+        current_browser = self.browser[self.tab_index]
+
+        # Obtém o ícone da página atual
+        page_icon = current_browser.page().icon()
+
+        # Verifica se o ícone é válido
+        if not page_icon.isNull():
+            # Cria um botão de ferramenta para o favorito
+            self.favorito_site = QToolButton()
+            self.favorito_site.setIcon(QIcon(page_icon))
+            self.favorito_site.setToolTip("Descrição do favorito")
+            self.favorito_site.setCheckable(True)
+            self.configuracaoBarra.addWidget(self.favorito_site)
+            self.favorito_site.setCursor(Qt.PointingHandCursor)
 
     def BrowserTab(self):
         # Definindo as preferências do navegador
@@ -303,7 +322,7 @@ class MainWindow(QMainWindow):
         pagina = [title, q.toString(), data.strftime("%d/%m/%Y")]
         if len(h) == 0 or h[-1] != pagina:
             h.append(pagina)
-        print(h)
+        #print(h)
 
 app = QApplication(sys.argv)
 window = MainWindow()
