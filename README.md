@@ -29,7 +29,7 @@ Não que eu tenha terminado todos, porem são os que eu quero fazer e terminar
 
  - [x] Abrir a Web
  - [ ] Histórico de navegação
- - [ ] Favoritos
+ - [x] Favoritos
  - [ ] Abas
  - [x] Pesquisa
  - [ ] Bloqueio de pop-ups e anúncios

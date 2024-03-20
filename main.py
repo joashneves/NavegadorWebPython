@@ -7,6 +7,11 @@ from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
 
+from componentes.BrowserMemory import BrowserMemory
+
+# Uso do BrowserMemory
+memoria_navegador = BrowserMemory()
+
 class MainWindow(QMainWindow):
 
     app = QCoreApplication.instance()
@@ -240,7 +245,7 @@ class MainWindow(QMainWindow):
         page_icon = current_browser.page().icon()
         page_title = current_browser.page().title()
         page_link = current_browser.page().url()
-
+        print(f'fav {page_link.toString()}')
         # Verifica se o ícone é válido
         if not page_icon.isNull():
             # Cria um botão de ferramenta para o favorito
@@ -251,8 +256,8 @@ class MainWindow(QMainWindow):
             self.favorito_site.setCheckable(True)
             self.configuracaoBarra.addWidget(self.favorito_site)
             self.favorito_site.setCursor(Qt.PointingHandCursor)
-
-
+        # Exemplo de como adicionar um favorito
+        memoria_navegador.adicionar_favorito(page_link.toString())
     def BrowserTab(self):
         # Definindo as preferências do navegador
         settings = self.browser.settings()
@@ -328,6 +333,26 @@ class MainWindow(QMainWindow):
         if len(h) == 0 or h[-1] != pagina:
             h.append(pagina)
         #print(h)
+    def load_memory(self):
+        self.tab_index = self.tab_widget.currentIndex()
+        current_browser = self.browser[self.tab_index]
+
+        # Obtém o ícone da página atual
+        page_icon = current_browser.page().icon()
+        page_title = current_browser.page().title()
+        page_link = current_browser.page().url()
+        print(memoria_navegador)
+        # Verifica se o ícone é válido
+        if not page_icon.isNull():
+            # Cria um botão de ferramenta para o favorito
+            self.favorito_site = QToolButton()
+            self.favorito_site.setIcon(QIcon(page_icon))
+            self.favorito_site.setToolTip(f"{page_title}")
+            self.favorito_site.clicked.connect(lambda: self.add_new_tab(page_link))
+            self.favorito_site.setCheckable(True)
+            self.configuracaoBarra.addWidget(self.favorito_site)
+            self.favorito_site.setCursor(Qt.PointingHandCursor)
+
 
 app = QApplication(sys.argv)
 window = MainWindow()
