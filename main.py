@@ -381,6 +381,7 @@ class MainWindow(QMainWindow):
             return None, None
     def load_favoritos(self):
         # Verificar se a pasta temporária existe e, se não, criá-la
+        x = 0;
         temp_folder = "temp/icons"
         if not os.path.exists(temp_folder):
             os.makedirs(temp_folder)
@@ -388,7 +389,7 @@ class MainWindow(QMainWindow):
         for site_pag in self.favoritos_sites_salvos:
             # Obtém o ícone e o título da página
             titulo, icone_link = self.obter_informacoes_pagina(site_pag)
-            print(site_pag)
+            print(self.favoritos_sites_salvos[x])
 
             try:
                 if icone_link:
@@ -398,12 +399,14 @@ class MainWindow(QMainWindow):
                     with open(icon_path, 'wb') as f:
                         icon_response = requests.get(icone_link)
                         f.write(icon_response.content)
-
+                    url = self.favoritos_sites_salvos[x]
                     # Cria um botão de ferramenta para o favorito
                     favorito_site = QToolButton()
                     favorito_site.setIcon(QIcon(icon_path))
                     favorito_site.setToolTip(titulo)
-                    favorito_site.clicked.connect(lambda url=site_pag: self.add_new_tab(site_pag))
+                    abrir_tab = self.criar_funcao_abrir_tab(url)
+                    favorito_site.clicked.connect(abrir_tab)
+
                     favorito_site.setCheckable(True)
                     self.configuracaoBarra.addWidget(favorito_site)
                     favorito_site.setCursor(Qt.PointingHandCursor)
@@ -411,7 +414,13 @@ class MainWindow(QMainWindow):
                     print("Ícone da página não encontrado para:", site_pag)
             except Exception as ex:
                 print("Erro ao carregar o ícone da página:", ex)
+            x = x + 1
 
+    def criar_funcao_abrir_tab(self, url):
+        def abrir_tab():
+            self.add_new_tab(url)
+
+        return abrir_tab
 
 
 app = QApplication(sys.argv)
