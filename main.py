@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 import PyQt5.uic.pyuic
 from PyQt5.QtCore import *
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QCursor
 from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
 
@@ -407,12 +407,11 @@ class MainWindow(QMainWindow):
                     abrir_tab = self.criar_funcao_abrir_tab(url)
                     favorito_site.clicked.connect(abrir_tab)
                     favorito_site.setCheckable(True)
-
-                    favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
-                    menucontexto = self.criar_funcao_remover_fav(favorito_site.pos, favorito_site)
-                    favorito_site.customContextMenuRequested.connect(menucontexto)
-                    self.configuracaoBarra.addWidget(favorito_site)
                     favorito_site.setCursor(Qt.PointingHandCursor)
+                    favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
+                    favorito_site.customContextMenuRequested.connect(self.show_custom_context_menu_fav)
+                    self.configuracaoBarra.addWidget(favorito_site)
+
                 else:
                     print("Ícone da página não encontrado para:", site_pag)
             except Exception as ex:
@@ -426,18 +425,33 @@ class MainWindow(QMainWindow):
         def remove_fav():
             self.mostrar_menu_contexto(pos, fav)
         return remove_fav
+    def show_custom_context_menu_fav(self,button):
+        context_menu = QMenu(self)
+        action1 = context_menu.addAction("Excluir")
+        action2 = context_menu.addAction("Abrir na guia atual")
+        action3 = context_menu.addAction("Debug")
+        global_point = self.mapToGlobal(button)
+        print("Coordenadas do ponto onde o menu foi criado:", global_point)
+        mouse_position = QCursor.pos()  # Obtém a posição atual do mouse na tela
+        action = context_menu.exec_(mouse_position)
 
-    def criar_menu_contexto(self, favorito_site):
-        menu = QMenu()
-        remover_action = menu.addAction("Remover Favorito")
-        remover_action.triggered.connect(lambda: self.remover_favorito(favorito_site))
-        return menu
-    def mostrar_menu_contexto(self, pos, favorito_site):
-        menu = self.criar_menu_contexto(favorito_site)
-        menu.exec_(favorito_site.mapToGlobal(pos))
-    def remover_favorito(self, favorito_site):
-        self.configuracaoBarra.removeWidget(favorito_site)
-        favorito_site.deleteLater()
+        if action == action1:
+            print("Item 1 selected")
+        elif action == action2:
+            print("Item 2 selected")
+        elif action == action3:
+            print(f"Item 3 selected from {mouse_position}")
+            widget_at_point = self.childAt(global_point)
+            if widget_at_point:
+                # Verificar se o widget encontrado é um QToolButton
+                if isinstance(widget_at_point, QToolButton):
+                    print(f"O menu de contexto foi chamado pelo botão {widget_at_point.toolTip()}")
+                else:
+                    print("O ponto especificado não está dentro de um QToolButton")
+            else:
+                print("Nenhum widget encontrado no ponto especificado")
+    def apagar_favorito(self, item):
+        pass
 
 
 app = QApplication(sys.argv)
