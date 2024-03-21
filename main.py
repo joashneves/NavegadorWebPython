@@ -1,5 +1,9 @@
 from datetime import datetime
 import sys
+import os
+
+import requests
+from bs4 import BeautifulSoup
 
 import PyQt5.uic.pyuic
 from PyQt5.QtCore import *
@@ -33,6 +37,10 @@ class MainWindow(QMainWindow):
         # Titulo
         self.setGeometry(0, 0, 800, 600)
         self.setWindowIcon(QIcon("./img/icon.svg"))
+
+        self.favoritos_sites_salvos = memoria_navegador.listar_favorito()
+        print(f'favoritos são {self.favoritos_sites_salvos}')
+        self.load_favoritos()
 
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
@@ -316,7 +324,6 @@ class MainWindow(QMainWindow):
         if len(h) == 0 or h[-1] != q.toString:
             h.append(q.toString())
     def update_urlbar(self, q):
-        print(q.toString())
         self.urlbar.setText(q.toString())
         self.urlbar.setCursorPosition(0)
     def load_home(self):
@@ -336,12 +343,10 @@ class MainWindow(QMainWindow):
     def load_memory(self):
         self.tab_index = self.tab_widget.currentIndex()
         current_browser = self.browser[self.tab_index]
-
         # Obtém o ícone da página atual
         page_icon = current_browser.page().icon()
         page_title = current_browser.page().title()
         page_link = current_browser.page().url()
-        print(memoria_navegador)
         # Verifica se o ícone é válido
         if not page_icon.isNull():
             # Cria um botão de ferramenta para o favorito
@@ -352,6 +357,61 @@ class MainWindow(QMainWindow):
             self.favorito_site.setCheckable(True)
             self.configuracaoBarra.addWidget(self.favorito_site)
             self.favorito_site.setCursor(Qt.PointingHandCursor)
+
+    def obter_informacoes_pagina(self,url):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()  # Verificar se houve erros na requisição
+
+            # Analisar o conteúdo HTML da página
+            soup = BeautifulSoup(response.text, 'html.parser')
+
+            # Obter o título da página
+            title = soup.title.string.strip() if soup.title else None
+
+            # Obter o link do ícone da página
+            icon_link = None
+            for link in soup.find_all('link', rel='icon'):
+                icon_link = link.get('href')
+                break
+
+            return title, icon_link
+        except requests.exceptions.RequestException as e:
+            print(f"Erro ao obter informações da página: {e}")
+            return None, None
+    def load_favoritos(self):
+        # Verificar se a pasta temporária existe e, se não, criá-la
+        temp_folder = "temp/icons"
+        if not os.path.exists(temp_folder):
+            os.makedirs(temp_folder)
+
+        for site_pag in self.favoritos_sites_salvos:
+            # Obtém o ícone e o título da página
+            titulo, icone_link = self.obter_informacoes_pagina(site_pag)
+            print(site_pag)
+
+            try:
+                if icone_link:
+                    # Baixar o ícone da página
+                    icon_filename = os.path.basename(icone_link)
+                    icon_path = os.path.join(temp_folder, icon_filename)
+                    with open(icon_path, 'wb') as f:
+                        icon_response = requests.get(icone_link)
+                        f.write(icon_response.content)
+
+                    # Cria um botão de ferramenta para o favorito
+                    favorito_site = QToolButton()
+                    favorito_site.setIcon(QIcon(icon_path))
+                    favorito_site.setToolTip(titulo)
+                    favorito_site.clicked.connect(lambda url=site_pag: self.add_new_tab(site_pag))
+                    favorito_site.setCheckable(True)
+                    self.configuracaoBarra.addWidget(favorito_site)
+                    favorito_site.setCursor(Qt.PointingHandCursor)
+                else:
+                    print("Ícone da página não encontrado para:", site_pag)
+            except Exception as ex:
+                print("Erro ao carregar o ícone da página:", ex)
+
 
 
 app = QApplication(sys.argv)

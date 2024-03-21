@@ -5,6 +5,10 @@ class BrowserMemory:
         self.favoritos = []
         self.historico = []
         self.tabs = []
+        self.carregar_memoria()
+
+    def listar_favorito(self):
+        return self.favoritos
 
     def adicionar_favorito(self, url):
         if url not in self.favoritos:
