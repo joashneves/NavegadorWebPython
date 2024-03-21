@@ -406,8 +406,11 @@ class MainWindow(QMainWindow):
                     favorito_site.setToolTip(titulo)
                     abrir_tab = self.criar_funcao_abrir_tab(url)
                     favorito_site.clicked.connect(abrir_tab)
-
                     favorito_site.setCheckable(True)
+
+                    favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
+                    menucontexto = self.criar_funcao_remover_fav(favorito_site.pos, favorito_site)
+                    favorito_site.customContextMenuRequested.connect(menucontexto)
                     self.configuracaoBarra.addWidget(favorito_site)
                     favorito_site.setCursor(Qt.PointingHandCursor)
                 else:
@@ -415,12 +418,26 @@ class MainWindow(QMainWindow):
             except Exception as ex:
                 print("Erro ao carregar o ícone da página:", ex)
             x = x + 1
-
     def criar_funcao_abrir_tab(self, url):
         def abrir_tab():
             self.add_new_tab(url)
-
         return abrir_tab
+    def criar_funcao_remover_fav(self, pos, fav):
+        def remove_fav():
+            self.mostrar_menu_contexto(pos, fav)
+        return remove_fav
+
+    def criar_menu_contexto(self, favorito_site):
+        menu = QMenu()
+        remover_action = menu.addAction("Remover Favorito")
+        remover_action.triggered.connect(lambda: self.remover_favorito(favorito_site))
+        return menu
+    def mostrar_menu_contexto(self, pos, favorito_site):
+        menu = self.criar_menu_contexto(favorito_site)
+        menu.exec_(favorito_site.mapToGlobal(pos))
+    def remover_favorito(self, favorito_site):
+        self.configuracaoBarra.removeWidget(favorito_site)
+        favorito_site.deleteLater()
 
 
 app = QApplication(sys.argv)
