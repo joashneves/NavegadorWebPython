@@ -3,6 +3,7 @@ import sys
 import os
 
 import requests
+from PyQt5.uic.properties import QtGui
 from bs4 import BeautifulSoup
 
 import PyQt5.uic.pyuic
@@ -40,7 +41,7 @@ class MainWindow(QMainWindow):
 
         self.favoritos_sites_salvos = memoria_navegador.listar_favorito()
         print(f'favoritos são {self.favoritos_sites_salvos}')
-        self.load_favoritos()
+        #self.load_favoritos()
 
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
@@ -256,6 +257,9 @@ class MainWindow(QMainWindow):
         print(f'fav {page_link.toString()}')
         # Verifica se o ícone é válido
         if not page_icon.isNull():
+            # Armazena as informações em um dicionário
+            favorito_info = {'icon': page_icon, 'title': page_title, 'link': page_link}
+            print(f'adicionado favorito {favorito_info}')
             # Cria um botão de ferramenta para o favorito
             self.favorito_site = QToolButton()
             self.favorito_site.setIcon(QIcon(page_icon))
@@ -265,7 +269,7 @@ class MainWindow(QMainWindow):
             self.configuracaoBarra.addWidget(self.favorito_site)
             self.favorito_site.setCursor(Qt.PointingHandCursor)
         # Exemplo de como adicionar um favorito
-        memoria_navegador.adicionar_favorito(page_link.toString())
+        memoria_navegador.adicionar_favorito(favorito_info)
     def BrowserTab(self):
         # Definindo as preferências do navegador
         settings = self.browser.settings()
@@ -409,7 +413,8 @@ class MainWindow(QMainWindow):
                     favorito_site.setCheckable(True)
                     favorito_site.setCursor(Qt.PointingHandCursor)
                     favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
-                    favorito_site.customContextMenuRequested.connect(self.show_custom_context_menu_fav)
+                    abrir_menu = self.criar_funcao_abrir_menu(favorito_site)
+                    favorito_site.customContextMenuRequested.connect(abrir_menu)
                     self.configuracaoBarra.addWidget(favorito_site)
 
                 else:
@@ -417,6 +422,22 @@ class MainWindow(QMainWindow):
             except Exception as ex:
                 print("Erro ao carregar o ícone da página:", ex)
             x = x + 1
+    def deletar_button(self, objeto):
+        objeto.deleteLater()
+        print(f'deletado o botão {objeto}')
+
+    def criar_funcao_abrir_menu(self, objeto):
+        def show_custom_context_menu_fav(pos):
+            # Aqui você pode usar o objeto do botão, pois ele foi capturado pela função de encerramento
+            print(f'Botão associado: {objeto}')
+            menu = QMenu()
+            deletar = menu.addAction("Deletar")
+            # Conectar a ação do menu a uma função para deletar o botão
+            deletar.triggered.connect(lambda: self.deletar_button(objeto))
+            menu.exec_(QCursor.pos())  # Exibir o menu na posição do cursor
+
+        return show_custom_context_menu_fav
+
     def criar_funcao_abrir_tab(self, url):
         def abrir_tab():
             self.add_new_tab(url)
@@ -425,31 +446,9 @@ class MainWindow(QMainWindow):
         def remove_fav():
             self.mostrar_menu_contexto(pos, fav)
         return remove_fav
-    def show_custom_context_menu_fav(self,button):
-        context_menu = QMenu(self)
-        action1 = context_menu.addAction("Excluir")
-        action2 = context_menu.addAction("Abrir na guia atual")
-        action3 = context_menu.addAction("Debug")
-        global_point = self.mapToGlobal(button)
-        print("Coordenadas do ponto onde o menu foi criado:", global_point)
-        mouse_position = QCursor.pos()  # Obtém a posição atual do mouse na tela
-        action = context_menu.exec_(mouse_position)
+    def show_custom_context_menu_fav(self,event):
+        print(f' criado mas chamado {event}')
 
-        if action == action1:
-            print("Item 1 selected")
-        elif action == action2:
-            print("Item 2 selected")
-        elif action == action3:
-            print(f"Item 3 selected from {mouse_position}")
-            widget_at_point = self.childAt(global_point)
-            if widget_at_point:
-                # Verificar se o widget encontrado é um QToolButton
-                if isinstance(widget_at_point, QToolButton):
-                    print(f"O menu de contexto foi chamado pelo botão {widget_at_point.toolTip()}")
-                else:
-                    print("O ponto especificado não está dentro de um QToolButton")
-            else:
-                print("Nenhum widget encontrado no ponto especificado")
     def apagar_favorito(self, item):
         pass
 

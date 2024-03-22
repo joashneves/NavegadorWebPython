@@ -13,7 +13,7 @@ class BrowserMemory:
     def adicionar_favorito(self, url):
         if url not in self.favoritos:
             self.favoritos.append(url)
-            self._salvar_memoria()
+            #self._salvar_memoria()
 
     def remover_favorito(self, url):
         if url in self.favoritos:
@@ -42,14 +42,17 @@ class BrowserMemory:
         with open("memoria.json", "w") as file:
             json.dump(memoria, file)
 
-
     def carregar_memoria(self):
         try:
             with open("memoria.json", "r") as file:
-                memoria = json.load(file)
-                self.favoritos = memoria.get("favoritos", [])
-                self.historico = memoria.get("historico", [])
-                self.tabs = memoria.get("tabs", [])
+                try:
+                    memoria = json.load(file)
+                    self.favoritos = memoria.get("favoritos", [])
+                    self.historico = memoria.get("historico", [])
+                    self.tabs = memoria.get("tabs", [])
+                except json.decoder.JSONDecodeError as ex:
+                    # Se o JSON estiver vazio ou não for válido, simplesmente ignore
+                    print(f"JSON arquivo esta vazio: {ex}")
         except FileNotFoundError:
             # Se o arquivo não existe, cria um novo
             self._salvar_memoria()
