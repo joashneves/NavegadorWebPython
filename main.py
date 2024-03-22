@@ -40,8 +40,7 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon("./img/icon.svg"))
 
         self.favoritos_sites_salvos = memoria_navegador.listar_favorito()
-        print(f'favoritos são {self.favoritos_sites_salvos}')
-        #self.load_favoritos()
+        self.load_favoritos()  # Carrega os favoritados anteriores
 
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
@@ -254,22 +253,23 @@ class MainWindow(QMainWindow):
         page_icon = current_browser.page().icon()
         page_title = current_browser.page().title()
         page_link = current_browser.page().url()
-        print(f'fav {page_link.toString()}')
+        print(f'fav {current_browser}')
         # Verifica se o ícone é válido
         if not page_icon.isNull():
-            # Armazena as informações em um dicionário
-            favorito_info = {'icon': page_icon, 'title': page_title, 'link': page_link}
-            print(f'adicionado favorito {favorito_info}')
             # Cria um botão de ferramenta para o favorito
-            self.favorito_site = QToolButton()
-            self.favorito_site.setIcon(QIcon(page_icon))
-            self.favorito_site.setToolTip(f"{page_title}")
-            self.favorito_site.clicked.connect(lambda: self.add_new_tab(page_link))
-            self.favorito_site.setCheckable(True)
-            self.configuracaoBarra.addWidget(self.favorito_site)
-            self.favorito_site.setCursor(Qt.PointingHandCursor)
-        # Exemplo de como adicionar um favorito
-        memoria_navegador.adicionar_favorito(favorito_info)
+            favorito_site = QToolButton()
+            favorito_site.setIcon(QIcon(page_icon))
+            favorito_site.setToolTip(page_title)
+            abrir_tab = self.criar_funcao_abrir_tab(page_link)
+            favorito_site.clicked.connect(abrir_tab)
+            favorito_site.setCheckable(True)
+            favorito_site.setCursor(Qt.PointingHandCursor)
+            favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
+            abrir_menu = self.criar_funcao_abrir_menu(favorito_site)
+            favorito_site.customContextMenuRequested.connect(abrir_menu)
+            self.configuracaoBarra.addWidget(favorito_site)
+            # Adiciona nos favoritos
+            memoria_navegador.adicionar_favorito(current_browser)
     def BrowserTab(self):
         # Definindo as preferências do navegador
         settings = self.browser.settings()
@@ -297,12 +297,7 @@ class MainWindow(QMainWindow):
         # Evento para mostrar o QWebEngineView quando o mouse estiver próximo
         self.centralWidget().setMouseTracking(True)
         self.centralWidget().installEventFilter(self)
-        """
-        button_action2 = QAction(QIcon("/img/settings.svg"), "Fav's", self)
-        button_action2.setStatusTip("This is your button2")
 
-        button_action2.setCheckable(True)
-        self.configuracaoBarra.addAction(button_action2)"""
     def mostrar_barra_lateral(self):
         if self.configuracaoBarra.isVisible():
             self.configuracaoBarra.setVisible(False)
@@ -344,23 +339,6 @@ class MainWindow(QMainWindow):
         if len(h) == 0 or h[-1] != pagina:
             h.append(pagina)
         #print(h)
-    def load_memory(self):
-        self.tab_index = self.tab_widget.currentIndex()
-        current_browser = self.browser[self.tab_index]
-        # Obtém o ícone da página atual
-        page_icon = current_browser.page().icon()
-        page_title = current_browser.page().title()
-        page_link = current_browser.page().url()
-        # Verifica se o ícone é válido
-        if not page_icon.isNull():
-            # Cria um botão de ferramenta para o favorito
-            self.favorito_site = QToolButton()
-            self.favorito_site.setIcon(QIcon(page_icon))
-            self.favorito_site.setToolTip(f"{page_title}")
-            self.favorito_site.clicked.connect(lambda: self.add_new_tab(page_link))
-            self.favorito_site.setCheckable(True)
-            self.configuracaoBarra.addWidget(self.favorito_site)
-            self.favorito_site.setCursor(Qt.PointingHandCursor)
 
     def obter_informacoes_pagina(self,url):
         try:
@@ -383,32 +361,30 @@ class MainWindow(QMainWindow):
         except requests.exceptions.RequestException as e:
             print(f"Erro ao obter informações da página: {e}")
             return None, None
+
     def load_favoritos(self):
         # Verificar se a pasta temporária existe e, se não, criá-la
-        x = 0;
         temp_folder = "temp/icons"
         if not os.path.exists(temp_folder):
             os.makedirs(temp_folder)
+        print(f'self.favoritos_sites_salvos == {self.favoritos_sites_salvos}')
 
-        for site_pag in self.favoritos_sites_salvos:
-            # Obtém o ícone e o título da página
-            titulo, icone_link = self.obter_informacoes_pagina(site_pag)
-            print(self.favoritos_sites_salvos[x])
-
+        for favorito in self.favoritos_sites_salvos:
             try:
-                if icone_link:
-                    # Baixar o ícone da página
-                    icon_filename = os.path.basename(icone_link)
-                    icon_path = os.path.join(temp_folder, icon_filename)
-                    with open(icon_path, 'wb') as f:
-                        icon_response = requests.get(icone_link)
-                        f.write(icon_response.content)
-                    url = self.favoritos_sites_salvos[x]
+                icon_path = favorito.get("icon_path")
+                if icon_path:
+                    # Verifica se o ícone já foi baixado
+                    if not os.path.exists(icon_path):
+                        # Baixar o ícone se ainda não estiver presente
+                        with open(icon_path, 'wb') as f:
+                            icon_response = requests.get(favorito["link"])
+                            f.write(icon_response.content)
+
                     # Cria um botão de ferramenta para o favorito
                     favorito_site = QToolButton()
                     favorito_site.setIcon(QIcon(icon_path))
-                    favorito_site.setToolTip(titulo)
-                    abrir_tab = self.criar_funcao_abrir_tab(url)
+                    favorito_site.setToolTip(favorito["title"])
+                    abrir_tab = self.criar_funcao_abrir_tab(favorito["link"])
                     favorito_site.clicked.connect(abrir_tab)
                     favorito_site.setCheckable(True)
                     favorito_site.setCursor(Qt.PointingHandCursor)
@@ -418,12 +394,13 @@ class MainWindow(QMainWindow):
                     self.configuracaoBarra.addWidget(favorito_site)
 
                 else:
-                    print("Ícone da página não encontrado para:", site_pag)
+                    print("Ícone da página não encontrado para:", favorito["title"])
             except Exception as ex:
                 print("Erro ao carregar o ícone da página:", ex)
-            x = x + 1
     def deletar_button(self, objeto):
         objeto.deleteLater()
+        print(f'nome {objeto.toolTip()}')
+        memoria_navegador.remover_favorito(objeto.toolTip())
         print(f'deletado o botão {objeto}')
 
     def criar_funcao_abrir_menu(self, objeto):
