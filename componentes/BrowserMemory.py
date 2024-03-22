@@ -34,13 +34,28 @@ class BrowserMemory:
             self._salvar_memoria()
 
     def _salvar_memoria(self):
-        memoria = {
-            "favoritos": self.favoritos,
-            "historico": self.historico,
-            "tabs": self.tabs
-        }
-        with open("memoria.json", "w") as file:
-            json.dump(memoria, file)
+        try:
+            favorito = self.favoritos
+            with open("favorito.json", "w") as file:
+                json.dump(favorito, file)
+            print('Dados Salvos Favoritos com sucesso')
+        except Exception as ex:
+            print(f'não foi possivel salvar dados: {ex}')
+        try:
+            historico = self.historico
+            with open("favorito.json", "w") as file:
+                json.dump(historico, file)
+            print('Dados Salvos Historico com sucesso')
+        except Exception as ex:
+            print(f'não foi possivel salvar dados: {ex}')
+        try:
+            tabs = self.tabs
+            with open("favorito.json", "w") as file:
+                json.dump(tabs, file)
+            print('Dados Salvos Historico com sucesso')
+        except Exception as ex:
+            print(f'não foi possivel salvar dados: {ex}')
+
 
     def carregar_memoria(self):
         try:
