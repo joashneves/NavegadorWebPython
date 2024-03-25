@@ -1,8 +1,11 @@
 import json
 import os
+from datetime import datetime
 
 import requests
 from PyQt5.QtGui import QIcon, QCursor
+
+hora = datetime
 
 class BrowserMemory:
     def __init__(self):
@@ -70,9 +73,25 @@ class BrowserMemory:
                 return  # Removido apenas um favorito, então podemos sair da função após a remoção
         print(f'Nenhum favorito encontrado para a URL: {title}')
 
-    def adicionar_historico(self, url):
-        self.historico.append(url)
-        self._salvar_memoria()
+    def adicionar_historico(self, current_browser):
+        try:
+            page_title = current_browser.page().title()
+            page_link = current_browser.page().url().toString()
+            hora_atual = datetime.now()
+            dia = {
+                "dia": hora_atual.strftime("%d-%m-%Y"),
+                "hora": hora_atual.strftime("%H:%M:%S"),
+                "titulo": page_title,
+                "link": page_link
+            }
+            print(dia)
+            self.historico.append(dia)
+            self._salvar_memoria()
+        except Exception as ex:
+            print(f'não foi possível adicionar ao historico: {ex}')
+
+    def listar_historico(self):
+        return self.historico
 
     def adicionar_tab(self, url):
         self.tabs.append(url)

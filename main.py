@@ -171,10 +171,39 @@ class MainWindow(QMainWindow):
         self.historico_botton.setIcon(QIcon('./img/config.svg'))
         self.historico_botton.setToolTip("Historico")
         self.historico_botton.setCheckable(True)
+        self.historico_botton.setContextMenuPolicy(Qt.CustomContextMenu)
+        abrir_menu = self.criar_funcao_abrir_menu_historico(self.historico_botton)
+        self.historico_botton.customContextMenuRequested.connect(abrir_menu)
         self.configuracaoBarra.addWidget(self.historico_botton)
         self.historico_botton.setCursor(Qt.PointingHandCursor)
 
         self.configuracaoBarra.addSeparator()
+    def criar_funcao_abrir_menu_historico(self, objeto):
+        def show_custom_context_menu_historico(pos):
+            # Aqui você pode usar o objeto do botão, pois ele foi capturado pela função de encerramento
+            print(f'Botão associado: {objeto}')
+            menu = QMenu()
+            historico = menu.addAction("Historico")
+            # Conectar a ação do menu a uma função para deletar o botão
+            for i in range(5):
+                submenu = menu.addMenu('Submenu %04d' % i)
+                font = submenu.font()
+                font.setPointSize(10)
+                submenu.setFont(font)
+                for n in range(10):
+                    action = submenu.addAction('Action %04d' % n)
+
+            menu.exec_(QCursor.pos())  # Exibir o menu na posição do cursor
+
+        return show_custom_context_menu_historico
+
+    def mouseEnterEvent(self, event):
+        show_menu_function = self.criar_funcao_abrir_menu_historico(self.sender())
+        show_menu_function(event)
+
+    def mouseLeaveEvent(self, event):
+        if self.menu_historico:
+            self.menu_historico.close()
 
     def navigate_reload(self):
         self.tab_index = self.tab_widget.currentIndex()
@@ -214,8 +243,6 @@ class MainWindow(QMainWindow):
         new_browser.setUrl(QUrl(link))
         page_title = new_browser.page().title()
 
-        print(len(self.browser))
-
         # Definindo as preferências do navegador
         settings = new_browser.settings()
         settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)
@@ -236,7 +263,6 @@ class MainWindow(QMainWindow):
         self.tab_widget.tabCloseRequested.connect(self.tab_closed)
         # Add the new tab to the QTabWidget
         self.tab_widget.addTab(new_widget, 'Nova aba')
-
     def update_tab_title(self, index, title):
         if len(title) > 26:
             title = title[:26]
@@ -244,7 +270,6 @@ class MainWindow(QMainWindow):
         q_url = self.browser[self.tab_index].url()
         self.update_urlbar(q_url)
         self.update_title()
-
     def add_fav(self):
         self.tab_index = self.tab_widget.currentIndex()
         current_browser = self.browser[self.tab_index]
@@ -270,45 +295,12 @@ class MainWindow(QMainWindow):
             self.configuracaoBarra.addWidget(favorito_site)
             # Adiciona nos favoritos
             memoria_navegador.adicionar_favorito(current_browser)
-    def BrowserTab(self):
-        # Definindo as preferências do navegador
-        settings = self.browser.settings()
-        settings.setAttribute(QWebEngineSettings.PluginsEnabled, True)
-        settings.setAttribute(QWebEngineSettings.AutoLoadImages, True)
-        settings.setAttribute(QWebEngineSettings.JavascriptEnabled, True)
-        settings.setAttribute(QWebEngineSettings.LocalStorageEnabled, True)
-        settings.setAttribute(QWebEngineSettings.JavascriptCanAccessClipboard, True)
-        settings.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows, True)
-        settings.setAttribute(QWebEngineSettings.JavascriptCanOpenWindows, True)
-        settings.setAttribute(QWebEngineSettings.Accelerated2dCanvasEnabled, True)
-        settings.setAttribute(QWebEngineSettings.WebGLEnabled, True)
-
-        self.browser.urlChanged.connect(self.update_urlbar) # muda a url da barra
-        self.browser.loadFinished.connect(self.update_title) # muda o nome do navegador
-
-        self.barra_ferramentas = QDockWidget("barra_ferramentas")
-        self.layout_1.addWidget(self.barra_ferramentas)
-
-        # Evento para mostrar o QWebEngineView quando o mouse estiver próximo da barra de ferramentas
-        self.barra_ferramentas.setMouseTracking(True)
-        self.barra_ferramentas.installEventFilter(self)
-
-        self.setCentralWidget(self.browser)
-        # Evento para mostrar o QWebEngineView quando o mouse estiver próximo
-        self.centralWidget().setMouseTracking(True)
-        self.centralWidget().installEventFilter(self)
-
     def mostrar_barra_lateral(self):
         if self.configuracaoBarra.isVisible():
             self.configuracaoBarra.setVisible(False)
         else:
             self.addToolBar(Qt.RightToolBarArea, self.configuracaoBarra)
             self.configuracaoBarra.setVisible(True)
-    def update_loading_progress(self, progress):
-        if progress == 100:
-            self.status_bar.showMessage("")
-        else:
-            self.status_bar.showMessage("Loading... {}%".format(progress))
     def navigate_to_url(self):
         self.tab_index = self.tab_widget.currentIndex()
         q = QUrl(self.urlbar.text())
@@ -332,36 +324,10 @@ class MainWindow(QMainWindow):
         title = self.browser[self.tab_index].page().title()
         self.setWindowTitle(f"Gallifrey - {title}")
         # Adiciona ao historico de pesquisa
-        q = QUrl(self.urlbar.text())
-        h = self.historico
-        data = datetime.now()
-        pagina = [title, q.toString(), data.strftime("%d/%m/%Y")]
-        if len(h) == 0 or h[-1] != pagina:
-            h.append(pagina)
-        #print(h)
+        current_browser =  self.browser[self.tab_index]
+        h = memoria_navegador.listar_historico()  # Assumindo que você tenha um método para obter o histórico
 
-    def obter_informacoes_pagina(self,url):
-        try:
-            response = requests.get(url)
-            response.raise_for_status()  # Verificar se houve erros na requisição
-
-            # Analisar o conteúdo HTML da página
-            soup = BeautifulSoup(response.text, 'html.parser')
-
-            # Obter o título da página
-            title = soup.title.string.strip() if soup.title else None
-
-            # Obter o link do ícone da página
-            icon_link = None
-            for link in soup.find_all('link', rel='icon'):
-                icon_link = link.get('href')
-                break
-
-            return title, icon_link
-        except requests.exceptions.RequestException as e:
-            print(f"Erro ao obter informações da página: {e}")
-            return None, None
-
+        memoria_navegador.adicionar_historico(current_browser)
     def load_favoritos(self):
         # Verificar se a pasta temporária existe e, se não, criá-la
         temp_folder = "temp/icons"
@@ -402,7 +368,6 @@ class MainWindow(QMainWindow):
         print(f'nome {objeto.toolTip()}')
         memoria_navegador.remover_favorito(objeto.toolTip())
         print(f'deletado o botão {objeto}')
-
     def criar_funcao_abrir_menu(self, objeto):
         def show_custom_context_menu_fav(pos):
             # Aqui você pode usar o objeto do botão, pois ele foi capturado pela função de encerramento
@@ -425,9 +390,6 @@ class MainWindow(QMainWindow):
         return remove_fav
     def show_custom_context_menu_fav(self,event):
         print(f' criado mas chamado {event}')
-
-    def apagar_favorito(self, item):
-        pass
 
 
 app = QApplication(sys.argv)
