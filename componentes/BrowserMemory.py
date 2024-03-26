@@ -93,14 +93,23 @@ class BrowserMemory:
                 self._salvar_memoria()
         except Exception as ex:
             sys.stderr.write(f'não foi possível adicionar ao historico: {ex}')
-
-
-
     def listar_historico(self):
         self.carregar_memoria()
         historico_lista_reversa = list(reversed(self.historico))
         print(f'Lista atual {historico_lista_reversa}')
         return historico_lista_reversa
+    def deletar_historico(self):
+        # Limpar a lista de histórico
+        self.historico = []
+        # Remover o arquivo JSON do histórico
+        arquivo_historico = os.path.join("memoria", "historico.json")
+        try:
+            os.remove(arquivo_historico)
+            print("Arquivo de histórico removido com sucesso.")
+        except FileNotFoundError:
+            print("Arquivo de histórico não encontrado.")
+        except Exception as e:
+            print(f"Ocorreu um erro ao tentar remover o arquivo de histórico: {e}")
 
     def adicionar_tab(self, url):
         self.tabs.append(url)

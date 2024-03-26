@@ -193,6 +193,11 @@ class MainWindow(QMainWindow):
                     sub_action = QAction(item['titulo'], self)
                     sub_action.triggered.connect(lambda checked, link=item['link']: self.browser[self.tab_index].setUrl(QUrl(link)))
                     historico_menu.addAction(sub_action)
+                # Adicionar Apagar
+                apagar_action = QAction("Apagar",self)
+                apagar_action.triggered.connect(memoria_navegador.deletar_historico)
+                menu.addAction(apagar_action)
+
                 menu.exec_(QCursor.pos())  # Exibir o menu na posição do cursor
             except Exception as e:
                 # Escrever mensagem de erro no console
