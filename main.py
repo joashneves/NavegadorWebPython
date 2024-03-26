@@ -189,10 +189,9 @@ class MainWindow(QMainWindow):
 
                 historico_list = memoria_navegador.listar_historico()
 
-
                 for item in historico_list:
-                    print(item['titulo'])
                     sub_action = QAction(item['titulo'], self)
+                    sub_action.triggered.connect(lambda checked, link=item['link']: self.browser[self.tab_index].setUrl(QUrl(link)))
                     historico_menu.addAction(sub_action)
                 menu.exec_(QCursor.pos())  # Exibir o menu na posição do cursor
             except Exception as e:

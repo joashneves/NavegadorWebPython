@@ -28,7 +28,7 @@ Não que eu tenha terminado todos, porem são os que eu quero fazer e terminar
 #### TODO
 
  - [x] Abrir a Web
- - [ ] Histórico de navegação
+ - [x] Histórico de navegação
  - [x] Favoritos
  - [ ] Abas
  - [x] Pesquisa
@@ -36,3 +36,9 @@ Não que eu tenha terminado todos, porem são os que eu quero fazer e terminar
  - [ ] Terminal para javascrip e inspenciona web
  - [ ] Dicionario
  - [ ] Configurações do navegador em html
+
+#### Correção de bugs
+
+- [ ] Icons fazem que os favoritos não sejam salvos
+- [ ] Aba não funciona corretamente ao fechar
+- [ ] Alguns sites não funcionam corretamente (como github, e chat gpt)
