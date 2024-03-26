@@ -176,11 +176,8 @@ class MainWindow(QMainWindow):
                 # Aqui você pode usar o objeto do botão, pois ele foi capturado pela função de encerramento
                 print(f'Botão associado: {objeto}')
                 menu = QMenu()
-
                 historico_menu = menu.addMenu("Histórico")
-
                 historico_list = memoria_navegador.listar_historico()
-
                 for item in historico_list:
                     sub_action = QAction(item['titulo'], self)
                     sub_action.triggered.connect(lambda checked, link=item['link']: self.browser[self.tab_index].setUrl(QUrl(link)))
