@@ -107,9 +107,9 @@ class BrowserMemory:
             os.remove(arquivo_historico)
             print("Arquivo de histórico removido com sucesso.")
         except FileNotFoundError:
-            print("Arquivo de histórico não encontrado.")
+            sys.stderr.write("Arquivo de histórico não encontrado.")
         except Exception as e:
-            print(f"Ocorreu um erro ao tentar remover o arquivo de histórico: {e}")
+            sys.stderr.write(f"Ocorreu um erro ao tentar remover o arquivo de histórico: {e}")
 
     def adicionar_tab(self, url):
         self.tabs.append(url)

@@ -45,14 +45,6 @@ class MainWindow(QMainWindow):
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
             self.setStyleSheet(f.read())
-        """
-        # Status bar
-        self.status_bar = QStatusBar()
-        self.setStatusBar(self.status_bar)
-
-        # Loading progress
-        if(self.browser.loadProgress):
-            self.browser.loadProgress.connect(self.update_loading_progress)"""
 
     def init_ui(self):
         # Create QTabWidget
@@ -365,7 +357,7 @@ class MainWindow(QMainWindow):
                     self.configuracaoBarra.addWidget(favorito_site)
 
                 else:
-                    print("Ícone da página não encontrado para:", favorito["title"])
+                    sys.stderr.write("Ícone da página não encontrado para:", favorito["title"])
             except Exception as ex:
                 sys.stderr.write(f"Erro ao carregar o ícone da página:{ex}")
     def deletar_button(self, objeto):
