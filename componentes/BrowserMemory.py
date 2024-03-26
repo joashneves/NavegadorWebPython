@@ -1,6 +1,8 @@
 import json
 import os
+import sys
 from datetime import datetime
+import re
 
 import requests
 from PyQt5.QtGui import QIcon, QCursor
@@ -34,7 +36,7 @@ class BrowserMemory:
 
             return icon_path
         except Exception as ex:
-            print(f'Não foi possível baixar o ícone: {ex}')
+            sys.stderr.write(f'Não foi possível baixar o ícone: {ex}')
             return None
 
     def adicionar_favorito(self, current_browser):
@@ -62,7 +64,7 @@ class BrowserMemory:
             self._salvar_memoria()
 
         except Exception as ex:
-            print(f'não foi possível adicionar favorito: {ex}')
+            sys.stderr.write(f'não foi possível adicionar favorito: {ex}')
 
     def remover_favorito(self, title):
         for favorito in self.favoritos:
@@ -71,27 +73,34 @@ class BrowserMemory:
                 self._salvar_memoria()
                 print(f'Favorito removido: {favorito}')
                 return  # Removido apenas um favorito, então podemos sair da função após a remoção
-        print(f'Nenhum favorito encontrado para a URL: {title}')
+        sys.stderr.write(f'Nenhum favorito encontrado para a URL: {title}')
 
     def adicionar_historico(self, current_browser):
         try:
             page_title = current_browser.page().title()
             page_link = current_browser.page().url().toString()
             hora_atual = datetime.now()
-            dia = {
-                "dia": hora_atual.strftime("%d-%m-%Y"),
-                "hora": hora_atual.strftime("%H:%M:%S"),
-                "titulo": page_title,
-                "link": page_link
-            }
-            print(dia)
-            self.historico.append(dia)
-            self._salvar_memoria()
+            # Verifica se o page_title não está vazio e não parece ser um link
+            if page_title.strip() and not re.match(r'^https?://', page_title):
+                dia = {
+                    "dia": hora_atual.strftime("%d-%m-%Y"),
+                    "hora": hora_atual.strftime("%H:%M:%S"),
+                    "titulo": page_title,
+                    "link": page_link
+                }
+                print(f'Enviado historico {dia["dia"]}, {dia["hora"]}, {dia["titulo"]}, {dia["link"]}')
+                self.historico.append(dia)
+                self._salvar_memoria()
         except Exception as ex:
-            print(f'não foi possível adicionar ao historico: {ex}')
+            sys.stderr.write(f'não foi possível adicionar ao historico: {ex}')
+
+
 
     def listar_historico(self):
-        return self.historico
+        self.carregar_memoria()
+        historico_lista_reversa = list(reversed(self.historico))
+        print(f'Lista atual {historico_lista_reversa}')
+        return historico_lista_reversa
 
     def adicionar_tab(self, url):
         self.tabs.append(url)
@@ -110,7 +119,7 @@ class BrowserMemory:
                 json.dump(favorito, file)
                 print(f'Dados Salvos Favoritos com sucesso {favorito}:{file}')
         except Exception as ex:
-            print(f'não foi possivel salvar dados: {ex}')
+            sys.stderr.write(f'não foi possivel salvar dados: {ex}')
         try:
             arquivo_historico = os.path.join("memoria", "historico.json")
             historico = self.historico
@@ -118,7 +127,7 @@ class BrowserMemory:
                 json.dump(historico, file)
                 print(f'Dados Salvos Historico com sucesso {historico}:{file}')
         except Exception as ex:
-            print(f'não foi possivel salvar dados: {ex}')
+            sys.stderr.write(f'não foi possivel salvar dados: {ex}')
         try:
             arquivo_tabs = os.path.join("memoria", "tabs.json")
             tabs = self.tabs
@@ -126,7 +135,7 @@ class BrowserMemory:
                 json.dump(tabs, file)
                 print(f'Dados Salvos Historico com sucesso {tabs}:{file}')
         except Exception as ex:
-            print(f'não foi possivel salvar dados: {ex}')
+            sys.stderr.write(f'não foi possivel salvar dados: {ex}')
 
     def carregar_memoria(self):
         try:
@@ -135,29 +144,29 @@ class BrowserMemory:
 
                 with open(arquivo_favorito, "r") as file:
                     fav = json.load(file)
-                    print(fav)
                     self.favoritos = fav
+                    print(f'Favoritos carregado : {self.favoritos}')
             except json.decoder.JSONDecodeError as ex:
                 # Se o JSON estiver vazio ou não for válido, simplesmente ignore
-                print(f"JSON de favoritos está vazio: {ex}")
+                sys.stderr.write(f"JSON de favoritos está vazio: {ex}")
 
             try:
                 arquivo_historico = os.path.join("memoria", "historico.json")
                 with open(arquivo_historico, "r") as file:
-                    historico = json.load(file)
-                    print(historico)
+                    self.historico = json.load(file)
+                    print(f'Historicos carregado : {self.historico}')
             except json.decoder.JSONDecodeError as ex:
                 # Se o JSON estiver vazio ou não for válido, simplesmente ignore
-                print(f"JSON de histórico está vazio: {ex}")
+                sys.stderr.write(f"JSON de histórico está vazio: {ex}")
 
             try:
                 arquivo_tabs = os.path.join("memoria", "tabs.json")
                 with open(arquivo_tabs, "r") as file:
-                    tabs = json.load(file)
-                    print(tabs)
+                    self.tabs = json.load(file)
+                    print(f'Tabs carregado : {self.tabs}')
             except json.decoder.JSONDecodeError as ex:
                 # Se o JSON estiver vazio ou não for válido, simplesmente ignore
-                print(f"JSON de abas está vazio: {ex}")
+                sys.stderr.write(f"JSON de abas está vazio: {ex}")
 
         except FileNotFoundError:
             # Se o arquivo não existe, cria um novo

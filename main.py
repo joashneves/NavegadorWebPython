@@ -180,20 +180,24 @@ class MainWindow(QMainWindow):
         self.configuracaoBarra.addSeparator()
     def criar_funcao_abrir_menu_historico(self, objeto):
         def show_custom_context_menu_historico(pos):
-            # Aqui você pode usar o objeto do botão, pois ele foi capturado pela função de encerramento
-            print(f'Botão associado: {objeto}')
-            menu = QMenu()
-            historico = menu.addAction("Historico")
-            # Conectar a ação do menu a uma função para deletar o botão
-            for i in range(5):
-                submenu = menu.addMenu('Submenu %04d' % i)
-                font = submenu.font()
-                font.setPointSize(10)
-                submenu.setFont(font)
-                for n in range(10):
-                    action = submenu.addAction('Action %04d' % n)
+            try:
+                # Aqui você pode usar o objeto do botão, pois ele foi capturado pela função de encerramento
+                print(f'Botão associado: {objeto}')
+                menu = QMenu()
 
-            menu.exec_(QCursor.pos())  # Exibir o menu na posição do cursor
+                historico_menu = menu.addMenu("Histórico")
+
+                historico_list = memoria_navegador.listar_historico()
+
+
+                for item in historico_list:
+                    print(item['titulo'])
+                    sub_action = QAction(item['titulo'], self)
+                    historico_menu.addAction(sub_action)
+                menu.exec_(QCursor.pos())  # Exibir o menu na posição do cursor
+            except Exception as e:
+                # Escrever mensagem de erro no console
+                sys.stderr.write(f'Ocorreu um erro: {e}\n')
 
         return show_custom_context_menu_historico
 
@@ -224,7 +228,7 @@ class MainWindow(QMainWindow):
             self.update_urlbar(q_url)
             print(f"alterado {q_url.toString()}")
         except Exception as ex:
-            print(f"Não consegui acessar a pagina {ex}")
+            sys.stderr.write(f"Não consegui acessar a pagina {ex}")
     def tab_closed(self, index):
         print(index)
         self.tab_widget.removeTab(index)
@@ -324,16 +328,13 @@ class MainWindow(QMainWindow):
         title = self.browser[self.tab_index].page().title()
         self.setWindowTitle(f"Gallifrey - {title}")
         # Adiciona ao historico de pesquisa
-        current_browser =  self.browser[self.tab_index]
-        h = memoria_navegador.listar_historico()  # Assumindo que você tenha um método para obter o histórico
-
+        current_browser = self.browser[self.tab_index]
         memoria_navegador.adicionar_historico(current_browser)
     def load_favoritos(self):
         # Verificar se a pasta temporária existe e, se não, criá-la
         temp_folder = "temp/icons"
         if not os.path.exists(temp_folder):
             os.makedirs(temp_folder)
-        print(f'self.favoritos_sites_salvos == {self.favoritos_sites_salvos}')
 
         for favorito in self.favoritos_sites_salvos:
             try:
@@ -362,7 +363,7 @@ class MainWindow(QMainWindow):
                 else:
                     print("Ícone da página não encontrado para:", favorito["title"])
             except Exception as ex:
-                print("Erro ao carregar o ícone da página:", ex)
+                sys.stderr.write(f"Erro ao carregar o ícone da página:{ex}")
     def deletar_button(self, objeto):
         objeto.deleteLater()
         print(f'nome {objeto.toolTip()}')
