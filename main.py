@@ -53,6 +53,8 @@ class MainWindow(QMainWindow):
         self.tab_widget.setTabsClosable(True)
         self.setCentralWidget(self.tab_widget)
 
+        self.dock_widget = None  # Variável para armazenar o QDockWidget
+
         self.barra_ferramentas = QToolBar()
         self.addToolBar(self.barra_ferramentas)
 
@@ -163,39 +165,45 @@ class MainWindow(QMainWindow):
         self.historico_botton.setIcon(QIcon('./img/config.svg'))
         self.historico_botton.setToolTip("Historico")
         self.historico_botton.setCheckable(True)
+        self.historico_botton.clicked.connect(self.criar_barra_de_historico)
         self.historico_botton.setContextMenuPolicy(Qt.CustomContextMenu)
         abrir_menu = self.criar_funcao_abrir_menu_historico(self.historico_botton)
         self.historico_botton.customContextMenuRequested.connect(abrir_menu)
         self.configuracaoBarra.addWidget(self.historico_botton)
         self.historico_botton.setCursor(Qt.PointingHandCursor)
 
-        # Segunda barra de ferramentas
-        self.historicoBarra = QToolBox()
-        # Adicione guias (páginas) à QToolBox
-        page1 = QWidget()
-        page1_label = QLabel("Page 1")
-        layout1 = QVBoxLayout()
-        layout1.addWidget(page1_label)
-        page1.setLayout(layout1)
-        self.historicoBarra.addItem(page1, "Page 1")
+    def criar_barra_de_historico(self):
 
-        page2 = QWidget()
-        page2_label = QLabel("Page 2")
-        layout2 = QVBoxLayout()
-        layout2.addWidget(page2_label)
-        page2.setLayout(layout2)
-        self.historicoBarra.addItem(page2, "Page 2")
+        if self.dock_widget and self.dock_widget.isVisible():
+            self.dock_widget.hide()  # Se sim, esconda-o
+        else:
+            # Segunda barra de ferramentas
+            self.historicoBarra = QToolBox()
+            # Adicione guias (páginas) à QToolBox
+            page1 = QWidget()
+            page1_label = QLabel("Page 1")
+            layout1 = QVBoxLayout()
+            layout1.addWidget(page1_label)
+            page1.setLayout(layout1)
+            self.historicoBarra.addItem(page1, "Page 1")
 
-        # Crie um QDockWidget
-        dock_widget = QDockWidget()
-        dock_widget.setWindowTitle("Dock Widget")
-        dock_widget.setWidget(self.historicoBarra)
+            page2 = QWidget()
+            page2_label = QLabel("Page 2")
+            layout2 = QVBoxLayout()
+            layout2.addWidget(page2_label)
+            page2.setLayout(layout2)
+            self.historicoBarra.addItem(page2, "Page 2")
 
-        # Defina o QDockWidget como estático e bloqueado
-        dock_widget.setFeatures(QDockWidget.NoDockWidgetFeatures)
+            # Crie um QDockWidget
+            self.dock_widget = QDockWidget()
+            self.dock_widget.setWindowTitle("Dock Widget")
+            self.dock_widget.setWidget(self.historicoBarra)
 
-        # Adicione o QDockWidget à janela principal
-        self.addDockWidget(Qt.RightDockWidgetArea, dock_widget)
+            # Defina o QDockWidget como estático e bloqueado
+            self.dock_widget.setFeatures(QDockWidget.NoDockWidgetFeatures)
+
+            # Adicione o QDockWidget à janela principal
+            self.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
 
     def criar_funcao_abrir_menu_historico(self, objeto):
         def show_custom_context_menu_historico(pos):
