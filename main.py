@@ -1,12 +1,10 @@
-from datetime import datetime
+
 import sys
 import os
-from functools import partial
 from itertools import islice
 
 import requests
 from PyQt5.uic.properties import QtGui
-from bs4 import BeautifulSoup
 
 import PyQt5.uic.pyuic
 from PyQt5.QtCore import *
@@ -211,7 +209,9 @@ class MainWindow(QMainWindow):
                 self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
                 self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
                 self.scroll.setWidgetResizable(True)
-                self.scroll.setWidget(self.historicoBarra)
+                self.scroll.setWidget(page1)
+
+                self.dock_widget.setWidget(self.scroll)
                 # Adicione o QDockWidget à janela principal
                 self.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
         except Exception as e:

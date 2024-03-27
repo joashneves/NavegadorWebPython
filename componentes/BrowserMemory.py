@@ -89,8 +89,11 @@ class BrowserMemory:
                     "link": page_link
                 }
                 print(f'Enviado historico {dia["dia"]}, {dia["hora"]}, {dia["titulo"]}, {dia["link"]}')
-                self.historico.append(dia)
-                self._salvar_memoria()
+                if dia["link"] == "https://www.google.com/":
+                    print(f'Home não adicionada {dia["link"]}')
+                else:
+                    self.historico.append(dia)
+                    self._salvar_memoria()
         except Exception as ex:
             sys.stderr.write(f'não foi possível adicionar ao historico: {ex}')
     def listar_historico(self):
