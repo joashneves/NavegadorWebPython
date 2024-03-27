@@ -1,6 +1,8 @@
 from datetime import datetime
 import sys
 import os
+from functools import partial
+from itertools import islice
 
 import requests
 from PyQt5.uic.properties import QtGui
@@ -173,37 +175,49 @@ class MainWindow(QMainWindow):
         self.historico_botton.setCursor(Qt.PointingHandCursor)
 
     def criar_barra_de_historico(self):
+        try:
+            if self.dock_widget and self.dock_widget.isVisible():
+                self.dock_widget.hide()  # Se sim, esconda-o
+            else:
+                # Segunda barra de ferramentas
+                self.historicoBarra = QVBoxLayout()
 
-        if self.dock_widget and self.dock_widget.isVisible():
-            self.dock_widget.hide()  # Se sim, esconda-o
-        else:
-            # Segunda barra de ferramentas
-            self.historicoBarra = QToolBox()
-            # Adicione guias (páginas) à QToolBox
-            page1 = QWidget()
-            page1_label = QLabel("Page 1")
-            layout1 = QVBoxLayout()
-            layout1.addWidget(page1_label)
-            page1.setLayout(layout1)
-            self.historicoBarra.addItem(page1, "Page 1")
+                historico_list = memoria_navegador.listar_historico()
+                historico_list_last = historico_list[-1:];
 
-            page2 = QWidget()
-            page2_label = QLabel("Page 2")
-            layout2 = QVBoxLayout()
-            layout2.addWidget(page2_label)
-            page2.setLayout(layout2)
-            self.historicoBarra.addItem(page2, "Page 2")
+                # Crie um QDockWidget
+                self.dock_widget = QDockWidget()
+                self.dock_widget.setWindowTitle("Historico")
+                # Defina o QDockWidget como estático e bloqueado
+                self.dock_widget.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
-            # Crie um QDockWidget
-            self.dock_widget = QDockWidget()
-            self.dock_widget.setWindowTitle("Dock Widget")
-            self.dock_widget.setWidget(self.historicoBarra)
+                page1 = QWidget()
+                exibir = QVBoxLayout()
+                for item in historico_list:
+                    link = QPushButton(f"{item['titulo']}")
+                    link.clicked.connect(lambda checked, link=item['link']: self.browser[self.tab_index].setUrl(QUrl(link)))
+                    exibir.addWidget(link)
+                page1.setLayout(exibir)
 
-            # Defina o QDockWidget como estático e bloqueado
-            self.dock_widget.setFeatures(QDockWidget.NoDockWidgetFeatures)
+                # Defina o widget como o widget do dock
+                self.dock_widget.setWidget(page1)
 
-            # Adicione o QDockWidget à janela principal
-            self.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
+                # Defina o QToolBox como widget do QDockWidget
+                self.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
+
+                self.scroll = QScrollArea()
+
+                # Scroll Area Properties
+                self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+                self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                self.scroll.setWidgetResizable(True)
+                self.scroll.setWidget(self.historicoBarra)
+                # Adicione o QDockWidget à janela principal
+                self.addDockWidget(Qt.RightDockWidgetArea, self.dock_widget)
+        except Exception as e:
+            # Escrever mensagem de erro no console
+            sys.stderr.write(f'Ocorreu um erro: {e}\n')
+
 
     def criar_funcao_abrir_menu_historico(self, objeto):
         def show_custom_context_menu_historico(pos):
@@ -213,7 +227,8 @@ class MainWindow(QMainWindow):
                 menu = QMenu()
                 historico_menu = menu.addMenu("Histórico")
                 historico_list = memoria_navegador.listar_historico()
-                for item in historico_list:
+                # Percorra somente os 8 primeiros itens da lista
+                for item in islice(historico_list, 8):
                     sub_action = QAction(item['titulo'], self)
                     sub_action.triggered.connect(lambda checked, link=item['link']: self.browser[self.tab_index].setUrl(QUrl(link)))
                     historico_menu.addAction(sub_action)
