@@ -80,6 +80,7 @@ class BrowserMemory:
             page_title = current_browser.page().title()
             page_link = current_browser.page().url().toString()
             hora_atual = datetime.now()
+
             # Verifica se o page_title não está vazio e não parece ser um link
             if page_title.strip() and not re.match(r'^https?://', page_title):
                 dia = {
@@ -89,6 +90,14 @@ class BrowserMemory:
                     "link": page_link
                 }
                 print(f'Enviado historico {dia["dia"]}, {dia["hora"]}, {dia["titulo"]}, {dia["link"]}')
+
+                # Verifica se o novo item é diferente do último item adicionado ao histórico
+                if self.historico:
+                    ultimo_item = self.historico[-1]
+                    if ultimo_item["titulo"] == dia["titulo"] and ultimo_item["link"] == dia["link"]:
+                        print("Este item já está no histórico.")
+                        return
+
                 if dia["link"] == "https://www.google.com/":
                     print(f'Home não adicionada {dia["link"]}')
                 else:
@@ -96,6 +105,7 @@ class BrowserMemory:
                     self._salvar_memoria()
         except Exception as ex:
             sys.stderr.write(f'não foi possível adicionar ao historico: {ex}')
+
     def listar_historico(self):
         self.carregar_memoria()
         historico_lista_reversa = list(reversed(self.historico))

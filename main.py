@@ -218,7 +218,6 @@ class MainWindow(QMainWindow):
             # Escrever mensagem de erro no console
             sys.stderr.write(f'Ocorreu um erro: {e}\n')
 
-
     def criar_funcao_abrir_menu_historico(self, objeto):
         def show_custom_context_menu_historico(pos):
             try:
@@ -316,7 +315,9 @@ class MainWindow(QMainWindow):
         self.tab_widget.setTabText(index, title)
         q_url = self.browser[self.tab_index].url()
         self.update_urlbar(q_url)
-        self.update_title()
+        print(f'{index} == {self.tab_index}')
+        if index == self.tab_index:
+            self.update_title()
     def add_fav(self):
         self.tab_index = self.tab_widget.currentIndex()
         current_browser = self.browser[self.tab_index]
@@ -370,7 +371,6 @@ class MainWindow(QMainWindow):
     def update_title(self):
         title = self.browser[self.tab_index].page().title()
         self.setWindowTitle(f"Gallifrey - {title}")
-        # Adiciona ao historico de pesquisa
         current_browser = self.browser[self.tab_index]
         memoria_navegador.adicionar_historico(current_browser)
     def load_favoritos(self):

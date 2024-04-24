@@ -42,4 +42,7 @@ Não que eu tenha terminado todos, porem são os que eu quero fazer e terminar
 - [ ] Icons fazem que os favoritos não sejam salvos
 - [ ] Aba não funciona corretamente ao fechar
 - [ ] Alguns sites não funcionam corretamente (como github, e chat gpt)
-- [ ] Historico repitido tem que arrumar isso ai (culpa do tab)
+- [ ] Tela cheia no youtube
+- [ ] Fazer lives funcionarem
+- [ ] Fazer funcionar no Linux(?)
+- [x] Historico repitido tem que arrumar isso ai (culpa do tab)
