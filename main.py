@@ -13,6 +13,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
 
 from componentes.BrowserMemory import BrowserMemory
+from componentes.Inspetor import ElementInspector  # Importa a Inspecionar elementos
 
 # Uso do BrowserMemory
 memoria_navegador = BrowserMemory()
@@ -45,6 +46,8 @@ class MainWindow(QMainWindow):
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
             self.setStyleSheet(f.read())
+        # Inicializa o inspetor de elementos
+        self.element_inspector = ElementInspector(self, self.browser)
 
     def init_ui(self):
         # Create QTabWidget
