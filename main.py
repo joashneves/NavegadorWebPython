@@ -46,8 +46,6 @@ class MainWindow(QMainWindow):
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
             self.setStyleSheet(f.read())
-        # Inicializa o inspetor de elementos
-        self.element_inspector = ElementInspector(self, self.browser)
 
     def init_ui(self):
         # Create QTabWidget
@@ -99,6 +97,7 @@ class MainWindow(QMainWindow):
 
         # Set the QTabWidget as the central widget of the QMainWindow
         self.setCentralWidget(self.tab_widget)
+
     def criar_barra_de_ferramentas(self):
         # Botão Voltar
         self.voltar_botao = QToolButton()
@@ -312,6 +311,9 @@ class MainWindow(QMainWindow):
         self.tab_widget.tabCloseRequested.connect(self.tab_closed)
         # Add the new tab to the QTabWidget
         self.tab_widget.addTab(new_widget, 'Nova aba')
+        # Inicializa o inspetor de elementos
+        self.element_inspector = ElementInspector(self, self.browser)
+
     def update_tab_title(self, index, title):
         if len(title) > 26:
             title = title[:26]

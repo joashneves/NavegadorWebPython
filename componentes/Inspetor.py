@@ -51,3 +51,7 @@ class ElementInspector:
             self.parent.addDockWidget(Qt.BottomDockWidgetArea, self.dock_widget)
         self.inspector_text.setText(element_info)
         self.dock_widget.setVisible(True)
+
+    def add_browser(self, browser):
+        self.browsers.append(browser)
+        self.configure_browsers([browser])
