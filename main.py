@@ -378,11 +378,15 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(f"Gallifrey - {title}")
         current_browser = self.browser[self.tab_index]
         memoria_navegador.adicionar_historico(current_browser)
+
     def load_favoritos(self):
         # Verificar se a pasta temporária existe e, se não, criá-la
         temp_folder = "temp/icons"
         if not os.path.exists(temp_folder):
             os.makedirs(temp_folder)
+
+        # Caminho para o ícone padrão
+        default_icon_path = "img/notFound.svg"
 
         for favorito in self.favoritos_sites_salvos:
             try:
@@ -390,10 +394,14 @@ class MainWindow(QMainWindow):
                 if icon_path:
                     # Verifica se o ícone já foi baixado
                     if not os.path.exists(icon_path):
-                        # Baixar o ícone se ainda não estiver presente
-                        with open(icon_path, 'wb') as f:
-                            icon_response = requests.get(favorito["link"])
-                            f.write(icon_response.content)
+                        try:
+                            # Baixar o ícone se ainda não estiver presente
+                            with open(icon_path, 'wb') as f:
+                                icon_response = requests.get(favorito["link"])
+                                f.write(icon_response.content)
+                        except Exception as download_ex:
+                            sys.stderr.write(f"Erro ao baixar o ícone: {download_ex}\n")
+                            icon_path = default_icon_path  # Use ícone padrão em caso de falha
 
                     # Cria um botão de ferramenta para o favorito
                     favorito_site = QToolButton()
@@ -409,9 +417,21 @@ class MainWindow(QMainWindow):
                     self.configuracaoBarra.addWidget(favorito_site)
 
                 else:
-                    sys.stderr.write("Ícone da página não encontrado para:", favorito["title"])
+                    sys.stderr.write(f"Ícone da página não encontrado para: {favorito['title']}\n")
             except Exception as ex:
-                sys.stderr.write(f"Erro ao carregar o ícone da página:{ex}")
+                sys.stderr.write(f"Erro ao carregar o ícone da página: {ex}\n")
+                # Adicionar o botão de favorito com o ícone padrão em caso de erro
+                favorito_site = QToolButton()
+                favorito_site.setIcon(QIcon(default_icon_path))
+                favorito_site.setToolTip(favorito["title"])
+                abrir_tab = self.criar_funcao_abrir_tab(favorito["link"])
+                favorito_site.clicked.connect(abrir_tab)
+                favorito_site.setCheckable(True)
+                favorito_site.setCursor(Qt.PointingHandCursor)
+                favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
+                abrir_menu = self.criar_funcao_abrir_menu(favorito_site)
+                favorito_site.customContextMenuRequested.connect(abrir_menu)
+                self.configuracaoBarra.addWidget(favorito_site)
     def deletar_button(self, objeto):
         objeto.deleteLater()
         print(f'nome {objeto.toolTip()}')

@@ -93,3 +93,9 @@ QPushButton:hover {
 QPushButton:pressed {
     background-color: #d9d2e9;
 }
+QDockWidget{
+    background-color: #c2c2c2;
+}
+QVBoxLayout{
+    background-color: #ff0000;
+}
