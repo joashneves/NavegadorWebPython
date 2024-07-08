@@ -29,12 +29,9 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         # Create list of QWebEngineView widgets
-        self.browser = [QWebEngineView() for _ in range(2)]
+        self.browser = []
 
         # Set URLs for the QWebEngineView widgets
-        for i, browser in enumerate(self.browser):
-            browser.setUrl(QUrl("http://www.google.com"))
-
         self.init_ui()
         # Titulo
         self.setGeometry(0, 0, 800, 600)
@@ -42,6 +39,9 @@ class MainWindow(QMainWindow):
 
         self.favoritos_sites_salvos = memoria_navegador.listar_favorito()
         self.load_favoritos()  # Carrega os favoritados anteriores
+
+        # Initialize ElementInspector for context menus
+        self.element_inspector = ElementInspector(self, self.browser)
 
         # Carrega o arquivo CSS e aplica o estilo
         with open("config/style.css", "r") as f:
@@ -62,8 +62,6 @@ class MainWindow(QMainWindow):
         self.tab_widget.currentChanged.connect(self.tab_changed)
         self.tab_index = self.tab_widget.currentIndex()
 
-        self.add_new_tab("http://www.google.com")
-
         self.criar_barra_de_ferramentas() # Cria barra de ferramentas
 
         # verifica aonde esta o     tab selecionado
@@ -82,6 +80,9 @@ class MainWindow(QMainWindow):
 
         # Set the QTabWidget as the central widget of the QMainWindow
         self.setCentralWidget(self.tab_widget)
+
+        # Inicializa a primeira aba
+        self.add_new_tab("http://www.google.com")
 
     def criar_barra_de_ferramentas(self):
         # Botão Voltar
@@ -173,14 +174,17 @@ class MainWindow(QMainWindow):
                 # Crie um QDockWidget
                 self.dock_widget = QDockWidget()
                 self.dock_widget.setWindowTitle("Historico")
+                self.dock_widget.setObjectName("historicoTitulo")  # Defina o nome do objeto para aplicar estilo
                 # Defina o QDockWidget como estático e bloqueado
                 self.dock_widget.setFeatures(QDockWidget.NoDockWidgetFeatures)
 
                 page1 = QWidget()
+                page1.setObjectName("historicoWidget")  # Defina o nome do objeto para aplicar estilo
                 exibir = QVBoxLayout()
                 for item in historico_list:
-                    link = QPushButton(f"{item['titulo']}")
+                    link = QPushButton(f"{item['titulo']}"  if len(item['titulo']) <= 40 else item['titulo'][:37] + '...')
                     link.clicked.connect(lambda checked, link=item['link']: self.browser[self.tab_index].setUrl(QUrl(link)))
+                    link.setObjectName("historicoBotao")  # Defina o nome do objeto para aplicar estilo
                     exibir.addWidget(link)
                 page1.setLayout(exibir)
 
@@ -215,11 +219,13 @@ class MainWindow(QMainWindow):
                 historico_list = memoria_navegador.listar_historico()
                 # Percorra somente os 8 primeiros itens da lista
                 for item in islice(historico_list, 8):
-                    sub_action = QAction(item['titulo'], self)
-                    sub_action.triggered.connect(lambda checked, link=item['link']: self.browser[self.tab_index].setUrl(QUrl(link)))
+                    titulo_truncado = item['titulo'] if len(item['titulo']) <= 30 else item['titulo'][:27] + '...'
+                    sub_action = QAction(titulo_truncado, self)
+                    sub_action.triggered.connect(
+                        lambda checked, link=item['link']: self.browser[self.tab_index].setUrl(QUrl(link)))
                     historico_menu.addAction(sub_action)
                 # Adicionar Apagar
-                apagar_action = QAction("Apagar",self)
+                apagar_action = QAction("Apagar", self)
                 apagar_action.triggered.connect(memoria_navegador.deletar_historico)
                 menu.addAction(apagar_action)
 
@@ -297,7 +303,10 @@ class MainWindow(QMainWindow):
         # Add the new tab to the QTabWidget
         self.tab_widget.addTab(new_widget, 'Nova aba')
         # Inicializa o inspetor de elementos
-        self.element_inspector = ElementInspector(self, self.browser)
+
+        # Configure context menu for the new browser
+        new_browser.setContextMenuPolicy(Qt.CustomContextMenu)
+        new_browser.customContextMenuRequested.connect(self.show_context_menu)
 
     def update_tab_title(self, index, title):
         if len(title) > 26:
@@ -363,7 +372,6 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(f"Gallifrey - {title}")
         current_browser = self.browser[self.tab_index]
         memoria_navegador.adicionar_historico(current_browser)
-
     def load_favoritos(self):
         # Verificar se a pasta temporária existe e, se não, criá-la
         temp_folder = "temp/icons"
@@ -411,8 +419,6 @@ class MainWindow(QMainWindow):
                 sys.stderr.write(f"Erro ao carregar o ícone da página: {ex}\n")
                 # Cria um botão de ferramenta para o favorito
                 adicionar_botao(default_icon_path)
-
-
     def deletar_button(self, objeto):
         objeto.deleteLater()
         print(f'nome {objeto.toolTip()}')
@@ -438,8 +444,33 @@ class MainWindow(QMainWindow):
         def remove_fav():
             self.mostrar_menu_contexto(pos, fav)
         return remove_fav
-    def show_custom_context_menu_fav(self,event):
-        print(f' criado mas chamado {event}')
+    def show_context_menu(self, position):
+        context_menu = QMenu()
+
+        # Adicionar ação para voltar
+        back_action = QAction("Voltar", self)
+        back_action.triggered.connect(self.navigate_back)
+        context_menu.addAction(back_action)
+
+        # Adicionar ação para avançar
+        reload_action = QAction("Recarregar", self)
+        reload_action.triggered.connect(self.navigate_reload)
+        context_menu.addAction(reload_action)
+
+        # Adicionar ação para avançar
+        forward_action = QAction("Avançar", self)
+        forward_action.triggered.connect(self.navigate_forward)
+        context_menu.addAction(forward_action)
+
+        # Adicionar separador
+        context_menu.addSeparator()
+
+        # Adicionar ação para inspecionar elemento
+        inspect_action = QAction("Inspecionar", self)
+        inspect_action.triggered.connect(lambda: self.element_inspector.inspect_element(position))
+        context_menu.addAction(inspect_action)
+
+        context_menu.exec_(self.browser[self.tab_index].mapToGlobal(position))
 
 
 app = QApplication(sys.argv)

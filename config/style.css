@@ -1,6 +1,6 @@
 /* style.css */
 QMainWindow {
-    background-color: #41166b; /* Cor de fundo da barra de título */
+    background-color: #392467 ;/*Roxo mais escuro*/ /* Cor de fundo da barra de título */
 }
 
 QWebEngineView {
@@ -30,7 +30,7 @@ QToolBar { /* Barra de ferramentas */
 }
 
 QToolButton { /* Botões da barra de ferramentas */
-    background-color: #20124d;
+    background-color: #392467 ;/*Roxo mais escuro*/;
     border: 1px solid black;
     padding: 4px;
     border-radius: 12px;
@@ -40,7 +40,7 @@ QToolButton { /* Botões da barra de ferramentas */
 }
 
 QToolButton:hover {
-    background-color: #8e7cc3;
+    background-color:  #A367B1 /*Roxo claro*/;
     border: 1px solid white;
     cursor: pointer;
 }
@@ -55,11 +55,11 @@ QTabWidget {
 
 /* Barra de guias */
 QTabBar {
-    background-color: #50237d;
+    background-color: #392467 ;/*Roxo mais escuro*/;
 }
 
 QTabBar::tab {
-    background-color: #50237d;
+    background-color:  #5D3587 /*Roxo escuro mais claro*/;
     color: white;
     padding: 8px 20px; /* Ajuste do padding */
     border-top-left-radius: 6px;
@@ -77,17 +77,17 @@ QTabBar::close-button:hover {
 }
 
 QTabBar::tab:!selected:hover {
-    background-color: #8e7cc3;
+    background-color:  #5D3587 /*Roxo escuro mais claro*/;
 }
 
 QTabBar::tab:selected {
-    background-color: #41166b;
+    background-color:  #5D3587 /*Roxo escuro mais claro*/;
     border: 2px solid black;
     border-bottom: none;
 }
 
 QPushButton {
-    background-color: #20124d;
+    background-color: #5D3587 /*Roxo escuro mais claro*/;
     color: white;
     border: none;
     padding: 6px 12px;
@@ -97,7 +97,7 @@ QPushButton {
 }
 
 QPushButton:hover {
-    background-color: #8e7cc3;
+    background-color: #A367B1 /*Roxo claro*/;
     border: 2px solid white;
     cursor: pointer;
 }
@@ -118,12 +118,35 @@ QVBoxLayout {
 /* Correções adicionais e melhorias estéticas */
 QScrollArea {
     border: none;
-    background-color: #f0f0f0;
+   background-color:  #392467 /*Roxo mais escuro*/;
 }
 
+QScrollArea QWidget {
+    background-color: #392467 /*Roxo mais escuro*/;
+}
 QTextEdit {
     background-color: white;
     border: 1px solid #ccc;
     padding: 6px;
     border-radius: 6px;
 }
+QDockWidget{
+    border: 1px solid #111;
+    background-color: #5D3587 /*Roxo escuro mais claro*/;
+}
+  #historicoWidget {
+            background-color:  #392467 /*Roxo mais escuro*/;
+            border: 1px solid #111;
+            padding: 10px;
+        }
+        #historicoBotao {
+            cursor: pointer;
+            background-color: #5D3587 /*Roxo escuro mais claro*/;
+            border: none;
+            padding: 5px 10px;
+            margin: 5px 0;
+        }
+        #historicoBotao:hover {
+            cursor: pointer;
+            background-color: #A367B1 /*Roxo claro*/;
+        }

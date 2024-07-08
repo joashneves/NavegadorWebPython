@@ -9,19 +9,6 @@ class ElementInspector:
         self.browsers = browsers
         self.dock_widget = None  # Variável para armazenar o QDockWidget
 
-        # Configurar menu de contexto para cada navegador
-        for browser in self.browsers:
-            browser.setContextMenuPolicy(Qt.CustomContextMenu)
-            browser.customContextMenuRequested.connect(self.show_context_menu)
-
-    def show_context_menu(self, position):
-        context_menu = QMenu()
-
-        inspect_action = QAction("Inspecionar", self.parent)
-        inspect_action.triggered.connect(lambda: self.inspect_element(position))
-        context_menu.addAction(inspect_action)
-
-        context_menu.exec_(self.browsers[self.parent.tab_index].mapToGlobal(position))
 
     def inspect_element(self, position):
         js_code = """
