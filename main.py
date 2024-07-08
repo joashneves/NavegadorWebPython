@@ -470,6 +470,10 @@ class MainWindow(QMainWindow):
         inspect_action.triggered.connect(lambda: self.element_inspector.inspect_element(position))
         context_menu.addAction(inspect_action)
 
+        view_source_action = QAction("Exibir código", self)
+        view_source_action.triggered.connect(lambda: self.element_inspector.view_page_source())
+        context_menu.addAction(view_source_action)
+
         context_menu.exec_(self.browser[self.tab_index].mapToGlobal(position))
 
 

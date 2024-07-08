@@ -3,6 +3,7 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import QIcon, QCursor
 from PyQt5.QtWidgets import *
 from PyQt5.QtWebEngineWidgets import *
+import sys
 class ElementInspector:
     def __init__(self, parent, browsers):
         self.parent = parent
@@ -42,3 +43,25 @@ class ElementInspector:
     def add_browser(self, browser):
         self.browsers.append(browser)
         self.configure_browsers([browser])
+
+
+    def view_page_source(self):
+        try:
+            self.browsers[0].page().toHtml(lambda html: self.display_page_source(html))
+        except Exception as ex:
+            sys.stderr.write(f'não foi possível exibir codigo fonte: {ex}')
+
+    def display_page_source(self, html):
+        try:
+            if not self.dock_widget:
+                self.dock_widget = QDockWidget("Código Fonte", self)
+                self.page_source_text = QTextEdit()
+                self.page_source_text.setPlainText(html)
+                self.page_source_text.setReadOnly(True)
+                self.dock_widget.setWidget(self.page_source_text)
+                self.addDockWidget(Qt.BottomDockWidgetArea, self.dock_widget)
+            else:
+                self.page_source_text.setPlainText(html)
+            self.dock_widget.setVisible(True)
+        except Exception as ex:
+            sys.stderr.write(f'não foi possível exibir codigo fonte: {ex}')
