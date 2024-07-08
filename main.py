@@ -88,7 +88,7 @@ class MainWindow(QMainWindow):
         # Add a button to create a new tab
         self.new_tab_button = QPushButton()
         self.new_tab_button.setObjectName("Adicionar_Tab")
-        self.new_tab_button.setIcon(QIcon('./img/barra.svg'))
+        self.new_tab_button.setIcon(QIcon('./img/add.svg'))
         self.new_tab_button.clicked.connect(lambda: self.add_new_tab("http://www.google.com"))
         self.new_tab_button.setToolTip("Adicionar Nova Aba")  # Definindo o texto da dica de ferramenta
 
@@ -134,7 +134,7 @@ class MainWindow(QMainWindow):
         self.barra_ferramentas.addWidget(self.urlbar)
 
         self.favoritar = QToolButton()
-        self.favoritar.setIcon(QIcon('./img/config.svg'))
+        self.favoritar.setIcon(QIcon('./img/fav.svg'))
         self.favoritar.setToolTip("Favoritar")
         self.favoritar.setCheckable(True)
         self.favoritar.clicked.connect(self.add_fav)
@@ -164,7 +164,7 @@ class MainWindow(QMainWindow):
         self.congiguracao_navegador.setCursor(Qt.PointingHandCursor)
 
         self.historico_botton = QToolButton()
-        self.historico_botton.setIcon(QIcon('./img/config.svg'))
+        self.historico_botton.setIcon(QIcon('./img/historic.svg'))
         self.historico_botton.setToolTip("Historico")
         self.historico_botton.setCheckable(True)
         self.historico_botton.clicked.connect(self.criar_barra_de_historico)
