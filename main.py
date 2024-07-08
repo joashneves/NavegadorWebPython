@@ -62,22 +62,7 @@ class MainWindow(QMainWindow):
         self.tab_widget.currentChanged.connect(self.tab_changed)
         self.tab_index = self.tab_widget.currentIndex()
 
-        # Create QWidget for the first tab
-        self.widget_1 = QWidget()
-        self.layout_1 = QVBoxLayout(self.widget_1)
-
-        self.layout_1.addWidget(self.browser[0])
-
-        # Add the first widget to the QTabWidget
-        self.tab_widget.addTab(self.widget_1, 'Tab 1')
-        # Create QWidget for the second tab
-        self.widget_2 = QWidget()
-        self.layout_2 = QVBoxLayout(self.widget_2)
-
-        self.layout_2.addWidget(self.browser[1])
-
-        # Add the second widget to the QTabWidget
-        self.tab_widget.addTab(self.widget_2, 'Tab 2')
+        self.add_new_tab("http://www.google.com")
 
         self.criar_barra_de_ferramentas() # Cria barra de ferramentas
 
@@ -388,6 +373,20 @@ class MainWindow(QMainWindow):
         # Caminho para o ícone padrão
         default_icon_path = "img/notFound.svg"
 
+        def adicionar_botao(icon):
+            # Adicionar o botão de favorito com o ícone padrão em caso de erro
+            favorito_site = QToolButton()
+            favorito_site.setIcon(QIcon(icon))
+            favorito_site.setToolTip(favorito["title"])
+            abrir_tab = self.criar_funcao_abrir_tab(favorito["link"])
+            favorito_site.clicked.connect(abrir_tab)
+            favorito_site.setCheckable(True)
+            favorito_site.setCursor(Qt.PointingHandCursor)
+            favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
+            abrir_menu = self.criar_funcao_abrir_menu(favorito_site)
+            favorito_site.customContextMenuRequested.connect(abrir_menu)
+            self.configuracaoBarra.addWidget(favorito_site)
+
         for favorito in self.favoritos_sites_salvos:
             try:
                 icon_path = favorito.get("icon_path")
@@ -404,34 +403,16 @@ class MainWindow(QMainWindow):
                             icon_path = default_icon_path  # Use ícone padrão em caso de falha
 
                     # Cria um botão de ferramenta para o favorito
-                    favorito_site = QToolButton()
-                    favorito_site.setIcon(QIcon(icon_path))
-                    favorito_site.setToolTip(favorito["title"])
-                    abrir_tab = self.criar_funcao_abrir_tab(favorito["link"])
-                    favorito_site.clicked.connect(abrir_tab)
-                    favorito_site.setCheckable(True)
-                    favorito_site.setCursor(Qt.PointingHandCursor)
-                    favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
-                    abrir_menu = self.criar_funcao_abrir_menu(favorito_site)
-                    favorito_site.customContextMenuRequested.connect(abrir_menu)
-                    self.configuracaoBarra.addWidget(favorito_site)
+                    adicionar_botao(icon_path)
 
                 else:
                     sys.stderr.write(f"Ícone da página não encontrado para: {favorito['title']}\n")
             except Exception as ex:
                 sys.stderr.write(f"Erro ao carregar o ícone da página: {ex}\n")
-                # Adicionar o botão de favorito com o ícone padrão em caso de erro
-                favorito_site = QToolButton()
-                favorito_site.setIcon(QIcon(default_icon_path))
-                favorito_site.setToolTip(favorito["title"])
-                abrir_tab = self.criar_funcao_abrir_tab(favorito["link"])
-                favorito_site.clicked.connect(abrir_tab)
-                favorito_site.setCheckable(True)
-                favorito_site.setCursor(Qt.PointingHandCursor)
-                favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
-                abrir_menu = self.criar_funcao_abrir_menu(favorito_site)
-                favorito_site.customContextMenuRequested.connect(abrir_menu)
-                self.configuracaoBarra.addWidget(favorito_site)
+                # Cria um botão de ferramenta para o favorito
+                adicionar_botao(default_icon_path)
+
+
     def deletar_button(self, objeto):
         objeto.deleteLater()
         print(f'nome {objeto.toolTip()}')
