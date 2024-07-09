@@ -269,6 +269,8 @@ class MainWindow(QMainWindow):
         self.tab_widget.removeTab(index)
         self.browser[index].close()
         del self.browser[index]
+        if index == 0:
+            sys.exit()
         self.reorganize_tabs()
     def reorganize_tabs(self):
         for i in range(len(self.browser)):
