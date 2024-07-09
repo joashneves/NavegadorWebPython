@@ -1,0 +1,108 @@
+/* style.css */
+*{
+    border-color: #111;
+}
+QMainWindow {
+    background-color: #253C59;
+}
+
+QWebEngineView {
+    background-color: #253C59;
+}
+#Adicionar_Tab{ /*Adicionar nova tab*/
+    background-color: #99B4BF;
+}
+QLineEdit { /* Barra de pesquisa */
+    height: 23px;
+    border-radius: 6px;
+}
+
+QLineEdit:selected { /* Barra de pesquisa ao passar o mouse */
+    border: 1px;
+    border-color:  #FFB303;
+}
+
+QToolBar { /* Barra de ferramentas */
+
+}
+
+QToolButton { /* Botões da barra de ferramentas */
+    border-radius: 12px;
+    background-color: #FFB303; /*  #FFB303; */
+    margin: 1px;
+}
+
+QToolButton:hover {
+
+    margin: 1px;
+    cursor: pointer;
+    background-color: #BF8D30;
+}
+
+QToolButton:pressed {
+    background-color: #BF8D30;
+}
+
+QTabWidget {
+    background-color: #99B4BF;
+}
+
+/* Barra de guias */
+QTabBar { /*Fundo das Tabs*/
+    background-color: #253C59;
+}
+
+QTabBar::tab { /*A Tab Normal */
+    background-color: #99B4BF;
+}
+
+QTabBar::close-button {
+
+}
+
+QTabBar::close-button:hover {
+
+}
+
+QTabBar::tab:!selected:hover {
+
+}
+
+QTabBar::tab:selected { /*Tab selecionada */
+    background-color: #253C59;
+}
+
+QPushButton {
+
+}
+
+QPushButton:hover {
+
+}
+
+QPushButton:pressed {
+
+}
+
+QDockWidget {
+
+}
+
+QVBoxLayout {
+
+}
+
+/* Correções adicionais e melhorias estéticas */
+QScrollArea {
+
+}
+
+QScrollArea QWidget {
+
+}
+QTextEdit {
+
+}
+QDockWidget{
+
+}

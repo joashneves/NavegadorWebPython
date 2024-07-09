@@ -10,6 +10,7 @@ class ElementInspector:
         self.parent = parent
         self.browsers = browsers
         self.dock_widget = None  # Variável para armazenar o QDockWidget
+        return
 
     def inspect_element(self, position):
         js_code = """

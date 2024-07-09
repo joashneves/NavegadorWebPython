@@ -58,6 +58,7 @@ class MainWindow(QMainWindow):
 
         self.barra_ferramentas = QToolBar()
         self.addToolBar(self.barra_ferramentas)
+        self.barra_ferramentas.setObjectName("barraFerramenta")
 
         self.tab_widget.currentChanged.connect(self.tab_changed)
         self.tab_index = self.tab_widget.currentIndex()
@@ -87,36 +88,41 @@ class MainWindow(QMainWindow):
     def criar_barra_de_ferramentas(self):
         # Botão Voltar
         self.voltar_botao = QToolButton()
-        self.voltar_botao.setText('<')
+        self.voltar_botao.setIcon(QIcon('./img/left.svg'))
         self.voltar_botao.clicked.connect(self.navigate_back)
         self.voltar_botao.setToolTip("Voltar")
         self.voltar_botao.setObjectName("voltar_botao")  # Definindo um ID único para o botão
+        self.voltar_botao.setCursor(Qt.PointingHandCursor)
         self.barra_ferramentas.addWidget(self.voltar_botao)
         # Botão Recarregar
         self.recarregar_botao = QToolButton()
-        self.recarregar_botao.setText('R')
+        self.recarregar_botao.setIcon(QIcon('./img/refresh.svg'))
         self.recarregar_botao.clicked.connect(self.navigate_reload)
         self.recarregar_botao.setToolTip("Recarregar")
         self.recarregar_botao.setObjectName("recarregar_botao")  # Definindo um ID único para o botão
+        self.recarregar_botao.setCursor(Qt.PointingHandCursor)
         self.barra_ferramentas.addWidget(self.recarregar_botao)
         # Botão Home
         self.home_botao = QToolButton()
-        self.home_botao.setText('H')
+        self.home_botao.setIcon(QIcon('./img/home.svg'))
         self.home_botao.clicked.connect(self.load_home)
         self.home_botao.setToolTip("Botão de Home")
         self.home_botao.setObjectName("home_botao")  # Definindo um ID único para o botão
+        self.home_botao.setCursor(Qt.PointingHandCursor)
         self.barra_ferramentas.addWidget(self.home_botao)
         # Botão Avançar
         self.avancar_botao = QToolButton()
-        self.avancar_botao.setText('>')
+        self.avancar_botao.setIcon(QIcon('./img/right.svg'))
         self.avancar_botao.clicked.connect(self.navigate_forward)
         self.avancar_botao.setToolTip("Avançar")
         self.avancar_botao.setObjectName("avancar_botao")
+        self.avancar_botao.setCursor(Qt.PointingHandCursor)
         self.avancar_botao.setVisible(True)
         self.barra_ferramentas.addWidget(self.avancar_botao)
         # Barra de pesquisa
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
+        self.urlbar.setCursor(Qt.PointingHandCursor)
         self.barra_ferramentas.addWidget(self.urlbar)
 
         self.favoritar = QToolButton()
@@ -319,31 +325,44 @@ class MainWindow(QMainWindow):
         print(f'{index} == {self.tab_index}')
         if index == self.tab_index:
             self.update_title()
+
     def add_fav(self):
+        # Obtém o índice da aba atual
         self.tab_index = self.tab_widget.currentIndex()
         current_browser = self.browser[self.tab_index]
 
-        # Obtém o ícone da página atual
+        # Obtém o ícone, título e URL da página atual
         page_icon = current_browser.page().icon()
         page_title = current_browser.page().title()
-        page_link = current_browser.page().url()
-        print(f'fav {current_browser}')
+        page_link = current_browser.page().url().toString()
+
         # Verifica se o ícone é válido
         if not page_icon.isNull():
-            # Cria um botão de ferramenta para o favorito
-            favorito_site = QToolButton()
-            favorito_site.setIcon(QIcon(page_icon))
-            favorito_site.setToolTip(page_title)
-            abrir_tab = self.criar_funcao_abrir_tab(page_link)
-            favorito_site.clicked.connect(abrir_tab)
-            favorito_site.setCheckable(True)
-            favorito_site.setCursor(Qt.PointingHandCursor)
-            favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
-            abrir_menu = self.criar_funcao_abrir_menu(favorito_site)
-            favorito_site.customContextMenuRequested.connect(abrir_menu)
-            self.configuracaoBarra.addWidget(favorito_site)
-            # Adiciona nos favoritos
-            memoria_navegador.adicionar_favorito(current_browser)
+            print(f'Fav: {page_title} : {page_link}')
+        else:
+            page_icon = QIcon("/img/notFound.svg")  # Define um ícone padrão caso o ícone da página seja nulo
+
+        # Verifica se o favorito já existe na memória
+        for favorito_site in self.configuracaoBarra.findChildren(QToolButton):
+            print(self.configuracaoBarra.findChildren(QToolButton))
+            if favorito_site.toolTip() == page_title:
+                self.deletar_button(favorito_site)
+                break
+
+        # Cria um botão de ferramenta para o favorito
+        favorito_site = QToolButton()
+        favorito_site.setIcon(page_icon)
+        favorito_site.setToolTip(page_title)
+        favorito_site.clicked.connect(lambda: self.browser[self.tab_index].setUrl(QUrl(page_link)))
+        favorito_site.setCheckable(True)
+        favorito_site.setCursor(Qt.PointingHandCursor)
+        favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
+        abrir_menu = self.criar_funcao_abrir_menu(favorito_site, QUrl(page_link))
+        favorito_site.customContextMenuRequested.connect(abrir_menu)
+
+        # Adiciona o botão de favorito à barra de configuração
+        self.configuracaoBarra.addWidget(favorito_site)
+        memoria_navegador.adicionar_favorito(current_browser)
     def mostrar_barra_lateral(self):
         if self.configuracaoBarra.isVisible():
             self.configuracaoBarra.setVisible(False)
@@ -388,12 +407,11 @@ class MainWindow(QMainWindow):
             favorito_site = QToolButton()
             favorito_site.setIcon(QIcon(icon))
             favorito_site.setToolTip(favorito["title"])
-            abrir_tab = self.criar_funcao_abrir_tab(favorito["link"])
-            favorito_site.clicked.connect(abrir_tab)
+            favorito_site.clicked.connect(lambda: self.browser[self.tab_index].setUrl(QUrl(favorito["link"])))
             favorito_site.setCheckable(True)
             favorito_site.setCursor(Qt.PointingHandCursor)
             favorito_site.setContextMenuPolicy(Qt.CustomContextMenu)
-            abrir_menu = self.criar_funcao_abrir_menu(favorito_site)
+            abrir_menu = self.criar_funcao_abrir_menu(favorito_site, favorito["link"])
             favorito_site.customContextMenuRequested.connect(abrir_menu)
             self.configuracaoBarra.addWidget(favorito_site)
 
@@ -426,14 +444,16 @@ class MainWindow(QMainWindow):
         print(f'nome {objeto.toolTip()}')
         memoria_navegador.remover_favorito(objeto.toolTip())
         print(f'deletado o botão {objeto}')
-    def criar_funcao_abrir_menu(self, objeto):
+    def criar_funcao_abrir_menu(self, objeto, link):
         def show_custom_context_menu_fav(pos):
             # Aqui você pode usar o objeto do botão, pois ele foi capturado pela função de encerramento
             print(f'Botão associado: {objeto}')
             menu = QMenu()
             deletar = menu.addAction("Deletar")
+            new_aba_fav = menu.addAction("Abrir nova Aba")
             # Conectar a ação do menu a uma função para deletar o botão
             deletar.triggered.connect(lambda: self.deletar_button(objeto))
+            new_aba_fav.triggered.connect( self.criar_funcao_abrir_tab(link))
             menu.exec_(QCursor.pos())  # Exibir o menu na posição do cursor
 
         return show_custom_context_menu_fav
