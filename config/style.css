@@ -13,13 +13,15 @@ QWebEngineView {
     background-color: #99B4BF;
 }
 QLineEdit { /* Barra de pesquisa */
+    background-color: #99B4BF;
+    margin: 0px 12px 0px 12px;
     height: 23px;
     border-radius: 6px;
 }
 
-QLineEdit:selected { /* Barra de pesquisa ao passar o mouse */
-    border: 1px;
-    border-color:  #FFB303;
+QLineEdit:hover { /* Barra de pesquisa ao passar o mouse */
+    background-color: #c8d7dc;
+    border-radius: 1px;
 }
 
 QToolBar { /* Barra de ferramentas */
@@ -33,7 +35,6 @@ QToolButton { /* Botões da barra de ferramentas */
 }
 
 QToolButton:hover {
-
     margin: 1px;
     cursor: pointer;
     background-color: #BF8D30;

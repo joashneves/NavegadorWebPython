@@ -18,6 +18,24 @@ from componentes.Inspetor import ElementInspector  # Importa a Inspecionar eleme
 # Uso do BrowserMemory
 memoria_navegador = BrowserMemory()
 
+
+class CustomLineEdit(QLineEdit):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Conecta o evento de foco com a função de seleção de texto
+        self.focused = False
+    def focusInEvent(self, event):
+        super().focusInEvent(event)
+        self.selectAll()
+        self.setStyleSheet("background-color: white;")
+
+    def focusOutEvent(self, event):
+        super().focusOutEvent(event)
+        # Remove a seleção de texto ao perder o foco
+        self.deselect()
+        self.setStyleSheet("")  # Reseta o estilo do fundo
+
 class MainWindow(QMainWindow):
 
     app = QCoreApplication.instance()
@@ -122,6 +140,8 @@ class MainWindow(QMainWindow):
         # Barra de pesquisa
         self.urlbar = QLineEdit()
         self.urlbar.returnPressed.connect(self.navigate_to_url)
+        self.urlbar.focusInEvent = self.urlbar_focus_in
+        self.urlbar.focusOutEvent = self.urlbar_focus_out
         self.urlbar.setCursor(Qt.PointingHandCursor)
         self.barra_ferramentas.addWidget(self.urlbar)
 
@@ -166,6 +186,14 @@ class MainWindow(QMainWindow):
         self.configuracaoBarra.addWidget(self.historico_botton)
         self.historico_botton.setCursor(Qt.PointingHandCursor)
 
+    def urlbar_focus_in(self, event):
+        self.urlbar.setStyleSheet("QLineEdit { background: white; }")
+        QLineEdit.focusInEvent(self.urlbar, event)
+        QTimer.singleShot(0, self.urlbar.selectAll)
+
+    def urlbar_focus_out(self, event):
+        self.urlbar.setStyleSheet("")
+        QLineEdit.focusOutEvent(self.urlbar, event)
     def criar_barra_de_historico(self):
         try:
             if self.dock_widget and self.dock_widget.isVisible():
@@ -277,10 +305,6 @@ class MainWindow(QMainWindow):
         del self.browser[index]
         if index == 0:
             sys.exit()
-        self.reorganize_tabs()
-    def reorganize_tabs(self):
-        for i in range(len(self.browser)):
-            self.tab_widget.setTabText(i, f'Tab {i+1}')
     def add_new_tab(self, link):
         # Aumentar o tamanho da lista para incluir um novo elemento
         self.browser.append(QWebEngineView())
@@ -370,6 +394,7 @@ class MainWindow(QMainWindow):
             self.addToolBar(Qt.RightToolBarArea, self.configuracaoBarra)
             self.configuracaoBarra.setVisible(True)
     def navigate_to_url(self):
+
         self.tab_index = self.tab_widget.currentIndex()
         q = QUrl(self.urlbar.text())
         if q.scheme() == "":
