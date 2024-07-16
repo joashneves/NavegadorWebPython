@@ -18,24 +18,6 @@ from componentes.Inspetor import ElementInspector  # Importa a Inspecionar eleme
 # Uso do BrowserMemory
 memoria_navegador = BrowserMemory()
 
-
-class CustomLineEdit(QLineEdit):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-        # Conecta o evento de foco com a função de seleção de texto
-        self.focused = False
-    def focusInEvent(self, event):
-        super().focusInEvent(event)
-        self.selectAll()
-        self.setStyleSheet("background-color: white;")
-
-    def focusOutEvent(self, event):
-        super().focusOutEvent(event)
-        # Remove a seleção de texto ao perder o foco
-        self.deselect()
-        self.setStyleSheet("")  # Reseta o estilo do fundo
-
 class MainWindow(QMainWindow):
 
     app = QCoreApplication.instance()
@@ -143,6 +125,7 @@ class MainWindow(QMainWindow):
         self.urlbar.focusInEvent = self.urlbar_focus_in
         self.urlbar.focusOutEvent = self.urlbar_focus_out
         self.urlbar.setCursor(Qt.PointingHandCursor)
+        self.urlbar.textChanged.connect(self.text_changed_event)  # Conectar o evento de mudança de texto
         self.barra_ferramentas.addWidget(self.urlbar)
 
         self.favoritar = QToolButton()
@@ -394,7 +377,6 @@ class MainWindow(QMainWindow):
             self.addToolBar(Qt.RightToolBarArea, self.configuracaoBarra)
             self.configuracaoBarra.setVisible(True)
     def navigate_to_url(self):
-
         self.tab_index = self.tab_widget.currentIndex()
         q = QUrl(self.urlbar.text())
         if q.scheme() == "":
@@ -410,6 +392,10 @@ class MainWindow(QMainWindow):
     def update_urlbar(self, q):
         self.urlbar.setText(q.toString())
         self.urlbar.setCursorPosition(0)
+    def text_changed_event(self, text):
+        print(f'Texto alterado: {text}')
+
+
     def load_home(self):
         self.tab_index = self.tab_widget.currentIndex()
         self.browser[self.tab_index].setUrl(QUrl("http://www.google.com"))
